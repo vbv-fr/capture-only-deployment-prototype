@@ -82,22 +82,43 @@
 (function () {
   'use strict';
   // ---- Edit only this block ------------------------------------------------
-  var TITLE = 'Capture-only deployment';
-  var SLUG = 'capture-only-deployment';             // short; gives the "<slug>-state" storage key and the "<slug>-nav" message
+  var TITLE = 'Configuration only instance and capture-only deployment';
+  var SLUG = 'cfgonly';                             // short; gives the "<slug>-state" storage key and the "<slug>-nav" message
   // In journey order. The number on each step is its position here, so reordering renumbers the bar.
   // group: starts a new labelled group at this step. file: the screen and its ?state=.
   // today: false when the step only exists after the change (greyed out in Today).
   var SECTIONS = [
-    { id: 'edge-instances',          group: 'Edge: Instances',             label: 'Instances table',              file: 'edge-instances.html?state=list' },
-    { id: 'edge-models-some',                                              label: 'Models: some',                 file: 'edge-instances.html?state=models-some', today: false },
-    { id: 'edge-models-incorrect',                                         label: 'Models: incorrect',            file: 'edge-instances.html?state=models-incorrect', today: false },
-    { id: 'edge-upload',                                                   label: 'Upload',                       file: 'edge-instances.html?state=upload' },
-    { id: 'edge-deploy-inference',   group: 'Edge: Capture and inference', label: 'Choose Capture and inference', file: 'edge-deploy.html?open=create&kind=inference' },
-    { id: 'edge-deployed-inference',                                       label: 'Deployed',                     file: 'edge-deploy.html?state=deployed-inference' },
-    { id: 'edge-deploy-model-free',                                        label: 'No model needed',              file: 'edge-deploy.html?open=deploy&target=line-6' },
-    { id: 'edge-deploy-capture',     group: 'Edge: Only capture',          label: 'Choose Only capture',          file: 'edge-deploy.html?open=create&kind=capture', today: false },
-    { id: 'edge-deployed-capture',                                         label: 'Deployed',                     file: 'edge-deploy.html?state=deployed-capture', today: false },
-    { id: 'edge-deploy-row',                                               label: 'Deploy from a row',            file: 'edge-deploy.html?open=deploy&target=line-4', today: false }
+    { id: 'vision-models',            group: 'Frinks Vision',               label: 'Model Selection',              file: 'vision-model-selection.html?state=create' },
+    { id: 'vision-instances',                                               label: 'Instance table',               file: 'vision-instances.html?state=models-remaining' },
+    { id: 'edge-upload',              group: 'Frinks Edge',                 label: 'Upload configuration',         file: 'edge-instances.html?state=upload' },
+    { id: 'edge-instances',                                                 label: 'Instances table',              file: 'edge-instances.html?state=uploaded' },
+    { id: 'edge-models-incorrect',                                          label: 'Model status: incorrect',      file: 'edge-instances.html?state=uploaded&open=models-L4', today: false },
+    { id: 'edge-instance',                                                  label: 'Instance page',                file: 'edge-instance-detail.html?state=no-models' },
+    { id: 'edge-test-locked',                                               label: 'Edge testing',                 file: 'edge-instance-detail.html?state=no-models&tab=testing&tip=1' },
+    { id: 'edge-dashboard',                                                 label: 'Dashboard Builder',            file: 'edge-dashboard.html?state=default&view=list' },
+    { id: 'edge-emc',                                                       label: 'Edit Module Configurations',   file: 'edge-emc.html?state=odc&models=none' },
+    { id: 'edge-deploy-inference',    group: 'Edge: Capture and inference', label: 'Choose Capture and inference', file: 'edge-deploy.html?open=create&kind=inference' },
+    { id: 'edge-inference-instances',                                       label: 'Pick instances',               file: 'edge-deploy.html?open=create&kind=inference&step=instance-details' },
+    { id: 'edge-deployed-inference',                                        label: 'Deployed',                     file: 'edge-deploy.html?state=deployed-inference' },
+    { id: 'edge-deploy-model-free',                                         label: 'No model needed',              file: 'edge-deploy.html?open=deploy&target=line-6&step=instance-details' },
+    { id: 'edge-deploy-capture',      group: 'Edge: Only capture',          label: 'Choose Only capture',          file: 'edge-deploy.html?open=create&kind=capture', today: false },
+    { id: 'edge-capture-instances',                                         label: 'Pick instances',               file: 'edge-deploy.html?open=create&kind=capture&step=instance-details', today: false },
+    { id: 'edge-deployed-capture',                                          label: 'Deployed',                     file: 'edge-deploy.html?state=deployed-capture', today: false },
+    { id: 'edge-deploy-row',                                                label: 'Deploy from a row',            file: 'edge-deploy.html?open=deploy&target=line-4', today: false },
+    { id: 'vision-some-models',       group: 'Vision: some models',         label: 'Add some models',              file: 'vision-model-selection.html?state=edit-some' },
+    { id: 'vision-download-some',                                           label: 'Download',                     file: 'vision-instances.html?state=some-models' },
+    { id: 'edge-upload-some',         group: 'Edge: some models',           label: 'Upload some models',           file: 'edge-instances.html?state=some-models' },
+    { id: 'edge-models-some',                                               label: 'Model status: some',           file: 'edge-instances.html?state=models&open=models-L3', today: false },
+    { id: 'edge-emc-some',                                                  label: 'Thresholds',                   file: 'edge-emc.html?state=odc&models=some' },
+    { id: 'edge-test-some',                                                 label: 'Edge testing',                 file: 'edge-instance-detail.html?state=some-models&tab=testing' },
+    { id: 'edge-capture-type',                                              label: 'Deploy: Capture Type',         file: 'edge-deploy.html?open=create&kind=inference&stage=some&step=capture-type' },
+    { id: 'vision-add-models',        group: 'Vision: all models',          label: 'Add remaining models',         file: 'vision-model-selection.html?state=edit' },
+    { id: 'vision-download-models',                                         label: 'Download models',              file: 'vision-instances.html?state=completed' },
+    { id: 'edge-add-models',          group: 'Edge: all models',            label: 'Upload models',                file: 'edge-instances.html?state=models' },
+    { id: 'edge-ready',                                                     label: 'Ready to deploy',              file: 'edge-deploy.html?open=create&kind=inference&stage=all&step=instance-details' },
+    { id: 'edge-reupload-config',     group: 'Edge: re-upload',             label: 'Re-upload configuration',      file: 'edge-instances.html?state=reupload-config' },
+    { id: 'edge-reupload-full',                                             label: 'Re-upload complete',           file: 'edge-instances.html?state=reupload-full' },
+    { id: 'edge-add-again',                                                 label: 'Add Instance again',           file: 'edge-instances.html?state=duplicate-id' }
   ];
   // --------------------------------------------------------------------------
 

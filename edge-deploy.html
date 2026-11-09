@@ -79,12 +79,12 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 .bg-status{position:fixed;top:16px;right:16px;z-index:999;display:flex;align-items:center;gap:8px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;padding:8px 16px;box-shadow:0 10px 15px -3px rgb(0 0 0/.1)}
 .bg-status .s{width:16px;height:16px;border-radius:9999px;border:2px solid #d1d5db;border-top-color:#ff4301;animation:spin 1s linear infinite}
 .bg-status span{font-size:14px;line-height:20px;font-weight:500}
-/* Models chips (pill style of AnalysedImageConfigurations.jsx:410; green/amber/grey/red Tailwind tones) */
-.mchip{display:inline-flex;align-items:center;border-radius:9999px;border:1px solid;padding:2px 8px;font-size:12px;line-height:16px;font-weight:500;white-space:nowrap}
-.mchip.all{border-color:#bbf7d0;background:#dcfce7;color:#166534}
-.mchip.some{border-color:#fde68a;background:#fef3c7;color:#92400e}
-.mchip.none{border-color:#e5e7eb;background:#f3f4f6;color:#4b5563}
-.mchip.bad{border-color:#fecaca;background:#fee2e2;color:#991b1b}
+/* Model Status chip (pill style of AnalysedImageConfigurations.jsx:410; green/yellow/grey/red Tailwind tones) */
+.mchip{display:inline-flex;align-items:center;border-radius:9999px;border:1px solid;padding:2px 8px;font-size:11px;line-height:16px;font-weight:500;white-space:nowrap}
+.mchip.all{border-color:#bbf7d0;background:#f0fdf4;color:#15803d}
+.mchip.some{border-color:#fef08a;background:#fefce8;color:#a16207}
+.mchip.none{border-color:#e5e7eb;background:#f3f4f6;color:#6b7280}
+.mchip.bad{border-color:#fecaca;background:#fef2f2;color:#b91c1c}
 /* "Only capture" tag next to a running instance's name (grey pill) */
 .tag-oc{display:inline-flex;align-items:center;border-radius:9999px;border:1px solid #e5e7eb;background:#f3f4f6;padding:2px 8px;font-size:12px;line-height:16px;font-weight:500;color:#4b5563;white-space:nowrap}
 .ml2{margin-left:8px}
@@ -95,19 +95,27 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 /* Greyed row in the drawer (bg-gray-100 + grey text, as InstanceTable.jsx:399) */
 .tbl tbody tr.off,.tbl tbody tr.off:hover{background:#f3f4f6;cursor:not-allowed}
 .tbl tbody tr.off td{color:#9ca3af}
-/* Radio group (shared/ui/Radio.jsx + FilePaths.jsx:174-197 label row) */
-.rg{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
-.rg-h{font-size:14px;line-height:20px;font-weight:600;color:#000}
-.rg-o{display:flex;align-items:center;gap:24px}
-.ro{display:flex;align-items:center;gap:8px;cursor:pointer}
-.ro span{font-size:14px;line-height:20px;color:#000}
+/* Radio dot (shared/ui/Radio.jsx) */
 .rd{width:24px;height:24px;border-radius:9999px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;color:#fff;cursor:pointer;filter:drop-shadow(0 1px 1px rgb(0 0 0/.05))}
 .rd:hover{filter:drop-shadow(0 20px 13px rgb(0 0 0/.03)) drop-shadow(0 8px 5px rgb(0 0 0/.08))}
 .rd i{width:8px;height:8px;border-radius:9999px;background:#fff}
 .rd.on{background:#ff4301}
-.ro.ro-ro,.ro.ro-ro .rd{cursor:default}
-.ro.dis{cursor:not-allowed;opacity:.5}
-.ro.dis .rd{cursor:not-allowed}
+/* Deployment Type step: two bento cards */
+.bento{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.bc{position:relative;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;cursor:pointer;text-align:left;transition:border-color .15s,background-color .15s}
+.bc:hover{border-color:#d1d5db}
+.bc.on,.bc.on:hover{border-color:#ff4301;box-shadow:0 0 0 1px #ff4301;background:#fff7ed}
+.bc:focus-visible{outline:2px solid #ff4301;outline-offset:2px}
+.bc .rd{position:absolute;top:20px;right:20px}
+.bc .rd:not(.on){background:#fff}
+.bc.ro,.bc.ro .rd{cursor:default}
+.bc.ro .rd:hover{filter:drop-shadow(0 1px 1px rgb(0 0 0/.05))}
+.bc.dis{opacity:.5;cursor:not-allowed}
+.bc.dis:hover{border-color:#e5e7eb}
+.bc.dis .rd{cursor:not-allowed}
+.bc-ic{display:flex;height:40px;width:40px;align-items:center;justify-content:center;border-radius:8px;background:#fff1eb;color:#ff4301;margin-bottom:12px}
+.bc-t{font-size:16px;line-height:24px;font-weight:600;color:#1f2937}
+.bc-d{margin-top:4px;font-size:14px;line-height:20px;color:#6b7280}
 
 /* Button (shared/ui/Button.jsx) */
 .b{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;height:fit-content;cursor:pointer;border:1px solid transparent;box-shadow:0 1px rgb(0 0 0/.05)}
@@ -167,6 +175,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 .cap-blk+.cap-blk{margin-top:32px}
 .cap-h{display:flex;align-items:center;justify-content:space-between;background:#f9fafb;padding:12px 16px;border-bottom:1px solid #e5e7eb}
 .cap-h span{font-weight:600;color:#1f2937}
+.cap-h .mchip{font-weight:500}
 .set-w{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}
 .ct{display:flex;align-items:center;justify-content:center;gap:8px}
 .ct span{font-size:14px;line-height:20px;font-weight:500;color:#1f2937}
@@ -372,76 +381,101 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 
   // ---------- Prototype params ----------
   // ?mode=today|after (default after)
-  // ?open=create&kind=inference|capture  "Deploy Instances" drawer (step 1), Capture and inference or Only capture picked
+  // ?stage=none|some|all (default none)  Line 3 Assembly's models: none = No models; some = 2 of 4 (Top View lacks Seal Bead and Surface Check); all = All models present
+  // ?open=create&kind=inference|capture  "Deploy Instances" drawer, Capture and inference or Only capture picked
   // ?open=deploy&target=line-N           that row's "Deploy" drawer
+  // ?open=view                           the first running instance's "View" drawer
+  // ?step=deployment-type|instance-details|capture-type|instance-settings  the drawer opens at that step (Today: deployment-type = Instance Details)
   // ?state=deployed-inference|deployed-capture  page after deploying (instances from the shared state are Running)
-  // ?tip=1 shows the first greyed row's checkbox tooltip (or the disabled option's tooltip in a row drawer)
+  // ?state=no-models (older links) = ?open=create&kind=inference;  ?state=ready = stage all, create drawer at Instance Details
+  // ?open=failed (Today) Line 3 Assembly failed to deploy without its models
+  // ?tip=1 shows the disabled Capture and inference card's tooltip (row drawer) or the first greyed row's checkbox tooltip
   var qs = new URLSearchParams(location.search);
   var mode = qs.get('mode') === 'today' ? 'today' : 'after';
   var after = mode === 'after';
   var state = qs.get('state') || '';
-  var open = qs.get('open') || '';
+  var legacy = state === 'no-models' || state === 'ready' || state === 'some-models';
+  var stage = /^(none|some|all)$/.test(qs.get('stage') || '') ? qs.get('stage') : state === 'ready' ? 'all' : state === 'some-models' ? 'some' : 'none';
+  var open = qs.get('open') || (legacy ? 'create' : '');
   var kindParam = qs.get('kind') === 'capture' ? 'capture' : 'inference';
-  var targetParam = qs.get('target') || '';
+  var targetParam = qs.get('target') || (legacy ? 'line-3' : '');
+  var stepParam = qs.get('step') || (state === 'ready' ? 'instance-details' : '');
   var forceTip = qs.get('tip') === '1';
   var inShell = false;
   try { inShell = window.self !== window.top; } catch (e) { inShell = true; }
 
-  // ---------- Shared prototype state (screen-wiring.js) ----------
-  var SLUG = 'capture-only-deployment';
-  var KEY = SLUG + '-state';
+  // ---------- Shared prototype state (localStorage "cfgonly-state") ----------
+  var KEY = 'cfgonly-state';
   var DEFAULTS = {
-    inference: { selected: ['line-1', 'line-2'], loadingMode: { 'line-1': 0, 'line-2': 0 } },
+    instanceName: 'Line 3 Assembly', instanceId: 'ab677d65-aa67-4bd2-a967-7a3fa86778ac',
+    inference: { selected: ['line-2', 'line-6'], loadingMode: { 'line-2': 0 } },
     capture: { selected: ['line-3', 'line-4'] }
   };
-  function readShared() {
+  function readRaw() {
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
-    return Object.assign({}, DEFAULTS, saved);
+    return saved && typeof saved === 'object' ? saved : {};
+  }
+  function readShared() {
+    var saved = readRaw(), out = Object.assign({}, DEFAULTS);
+    Object.keys(saved).forEach(function (k) { if (saved[k] !== undefined && saved[k] !== null && saved[k] !== '') out[k] = saved[k]; });
+    if (typeof out.instanceName !== 'string' || !out.instanceName) out.instanceName = DEFAULTS.instanceName;
+    if (typeof out.instanceId !== 'string' || !out.instanceId) out.instanceId = DEFAULTS.instanceId;
+    return out;
   }
   function writeShared(change) {
-    var next = Object.assign(readShared(), change);
+    var next = Object.assign(readRaw(), change);
     try { localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) { /* ignore */ }
-    return next;
   }
   function goToStep(id) {
     if (!inShell) return false;
-    try { window.parent.postMessage({ type: SLUG + '-nav', to: id }, '*'); } catch (e) { /* ignore */ }
+    try { window.parent.postMessage({ type: 'cfgonly-nav', to: id }, '*'); } catch (e) { /* ignore */ }
     return true;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   // ---------- Instances on this Edge (GET /instance/list + /deployment/status) ----------
   // All four stopped. Default dashboards are named after the instance.
-  // models: all | some | none | bad (Incorrect models). needsModel false = captures with only master images / Search Areas.
-  function mk(n, models, count, needsModel) {
+  // models: all | some | none | bad (Incorrect models). missing: model-needing modules without a model.
+  // needsModel false = captures with only master images / Search Areas.
+  var CAPTURES = [
+    { variant: 'Variant A', capture: 'Front View', type: 'Hardware Trigger', event: 'Line 0', modules: ['Part Presence', 'Label Text'] },
+    { variant: 'Variant A', capture: 'Top View', type: 'Hardware Trigger', event: 'Line 1', modules: ['Seal Bead', 'Surface Check'] }
+  ];
+  var ALL_MODULES = ['Part Presence', 'Label Text', 'Seal Bead', 'Surface Check'];
+  var TOTAL_MODULES = ALL_MODULES.length;
+  function mk(n, models, missing, needsModel) {
     return { id: 'line-' + n, name: 'Line ' + n + ' Assembly', activeDashboard: 'Line ' + n + ' Assembly', plcName: 'PLC 1',
-      status: 'stopped', kind: null, loadingMode: null, cycleTime: null, screen: null, variant: 'Variant A', models: models, count: count,
-      needsModel: needsModel !== false };
+      status: 'stopped', kind: null, loadingMode: null, cycleTime: null, screen: null, variant: 'Variant A',
+      models: models, missing: missing, needsModel: needsModel !== false };
   }
-  var INSTANCES = [mk(1, 'all', 5), mk(2, 'some', 3), mk(3, 'none', 0), mk(4, 'bad', 5), mk(6, 'all', 0, false)];
-  // Line 5 exists only once the Upload step has added it.
-  if (readShared().line5Uploaded) INSTANCES.splice(4, 0, mk(5, 'none', 0));
-  var TOTAL_MODULES = 5;
+  var L3_MODELS = { none: ['none', ALL_MODULES], some: ['some', ['Seal Bead', 'Surface Check']], all: ['all', []] }[stage];
+  var INSTANCES = [mk(2, 'all', []), mk(3, L3_MODELS[0], L3_MODELS[1]), mk(4, 'bad', ALL_MODULES), mk(6, 'all', [], false)];
+  var L3 = INSTANCES[1];
+  function syncNames() { var S = readShared(); L3.name = S.instanceName; L3.activeDashboard = S.instanceName; L3.instanceId = S.instanceId; }
+  syncNames();
   function list() { return INSTANCES; }
   var LM = { 0: 'Instance level', 1: 'Variant level', 2: 'Capture group level', 3: 'Capture level' };
   var LOADING_MODES = [{ id: 0, name: 'Instance level' }, { id: 1, name: 'Variant level' }, { id: 3, name: 'Capture level' }];
-  var CAPTURES = [
-    { variant: 'Variant A', capture: 'Front View', type: 'Hardware Trigger', event: 'Line 0' },
-    { variant: 'Variant A', capture: 'Top View', type: 'Hardware Trigger', event: 'Line 1' }
-  ];
   var KIND_LABEL = { inference: 'Capture and inference', capture: 'Only capture' };
+  var KIND_DESC = { inference: 'Images are inspected with AI models.', capture: 'Raw images are saved. No AI models are loaded.' };
+  var DT_TIP = 'Capture and inference: images are inspected. Only capture: raw images are saved, no results.';
   var NO_INFERENCE = {
     none: 'No models on this instance. Choose Only capture to deploy it.',
     bad: 'Incorrect models on this instance. Choose Only capture to deploy it.'
   };
   var NO_INFERENCE_SHORT = { none: 'No models on this instance.', bad: 'Incorrect models on this instance.' };
   function canInfer(inst) { return inst.models === 'all' || inst.models === 'some'; }
+  // Today: the deploy check skips empty model slots, so an instance that still lacks models starts and then fails.
+  function missingToday(inst) { return inst.needsModel && (inst.models === 'none' || inst.models === 'some'); }
   function chip(inst) {
     var m = inst.models;
-    var label = m === 'all' ? 'All models' : m === 'some' ? 'Some models (' + inst.count + ' of ' + TOTAL_MODULES + ')' : m === 'none' ? 'No models' : 'Incorrect models';
+    var label = m === 'all' ? 'All models present' : m === 'some' ? (TOTAL_MODULES - inst.missing.length) + ' of ' + TOTAL_MODULES + ' models present' : m === 'none' ? 'No models' : 'Incorrect models';
     return '<span class="mchip ' + m + '">' + esc(label) + '</span>';
   }
+  // A capture runs inference when the instance needs no model, or every model-needing module in it has a model.
+  function captureInfers(inst, c) { return !inst.needsModel || c.modules.every(function (m) { return inst.missing.indexOf(m) < 0; }); }
+
   // ---------- Icons ----------
   var INFO16 = '<svg stroke="currentColor" fill="none" stroke-width="2.25" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>';
   var ROCKET = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9166 10.5834C20.1666 8.3334 20.3072 5.65683 20.2369 4.4634C20.2252 4.2815 20.1476 4.11009 20.0188 3.98121C19.8899 3.85232 19.7185 3.77478 19.5366 3.76308C18.3431 3.69277 15.6684 3.83152 13.4166 6.0834L7.5 12L12 16.5L17.9166 10.5834Z"/><path d="M12.7502 6.75H6.97055C6.77191 6.75009 6.58141 6.82899 6.44087 6.96937L3.22055 10.1897C3.12223 10.2882 3.05327 10.4122 3.0214 10.5477C2.98952 10.6832 2.99598 10.8249 3.04006 10.9569C3.08413 11.089 3.16409 11.2061 3.27097 11.2953C3.37785 11.3845 3.50744 11.4422 3.64524 11.4619L7.50024 12"/><path d="M17.25 11.25V17.0297C17.2499 17.2283 17.171 17.4188 17.0306 17.5594L13.8103 20.7797C13.7118 20.878 13.5878 20.947 13.4523 20.9788C13.3168 21.0107 13.1751 21.0043 13.0431 20.9602C12.911 20.9161 12.7939 20.8362 12.7047 20.7293C12.6155 20.6224 12.5578 20.4928 12.5381 20.355L12 16.5"/><path d="M8.865 17.6098C8.50219 18.4058 7.27969 20.2517 3.75 20.2517C3.75 16.722 5.59594 15.4995 6.39188 15.1367"/></svg>';
@@ -453,6 +487,11 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   var CLOSE25 = '<svg width="25" height="25" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 8L8 24M8 8L24 24" stroke="#0E0F0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var UPDOWN = '<svg width="16" height="24" viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:20px"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.00048 5.29297L11.8545 9.14597L11.1475 9.85397L8.00048 6.70697L4.85448 9.85397L4.14648 9.14597L8.00048 5.29297Z" fill="#acacac"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.00048 18.707L11.8545 14.854L11.1475 14.146L8.00048 17.293L4.85448 14.146L4.14648 14.854L8.00048 18.707Z" fill="#acacac"/></svg>';
   var TICK = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:20px"><path d="M16.3333 3.86162C16.0907 3.61904 15.7134 3.61904 15.4708 3.86162L6.30674 12.7562L1.77862 8.30889C1.53604 8.06631 1.15869 8.09326 0.916115 8.30889C0.673537 8.55146 0.70049 8.92881 0.916115 9.17139L5.68682 13.8073C5.84854 13.969 6.06416 14.0499 6.30674 14.0499C6.54932 14.0499 6.73799 13.969 6.92666 13.8073L16.3333 4.67021C16.5759 4.48154 16.5759 4.1042 16.3333 3.86162Z" fill="currentColor"/></svg>';
+  // Deployment Type cards: camera with a sparkle (Capture and inference), plain camera (Only capture)
+  var KIND_ICON = {
+    inference: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M18 18.5a2 2 0 0 1-2 2H3.5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.75L8 6h4.5l1.75 2.5H16a2 2 0 0 1 2 2z"/><circle cx="9.75" cy="14.25" r="3"/><path d="M20 1.75l.8 1.95 1.95.8-1.95.8-.8 1.95-.8-1.95-1.95-.8 1.95-.8z"/></svg>',
+    capture: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+  };
 
   // ---------- Tooltip (shared/components/Tooltip.jsx) ----------
   var tipEl = null, tipTimer = null, tipOwner = null;
@@ -571,9 +610,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
         act = '<div class="row-acts"><button type="button" class="b b-pri b-lg" data-view="' + r.id + '">' + EYE + '<span>View</span></button>' +
           '<button type="button" class="b b-dark b-lg" data-stop="' + r.id + '">' + STOP + '<span>Stop</span></button></div>';
       } else {
-        var reason = '';
-        act = '<div class="tip-blk"' + (reason ? ' data-tip="' + esc(reason) + '" id="rowTip"' : '') + '>' +
-          '<button type="button" class="b b-pri b-lg minw120" data-deploy="' + r.id + '"' + (reason ? ' disabled' : '') + '>' + ROCKET +
+        act = '<div class="tip-blk"><button type="button" class="b b-pri b-lg minw120" data-deploy="' + r.id + '">' + ROCKET +
           '<span>' + (r.status === 'failed' ? 'Retry' : 'Deploy') + '</span></button></div>';
       }
       return '<tr>' +
@@ -598,9 +635,19 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     sizeColumns();
   }
 
-  // ---------- Deployment drawer (CreateDeployment.jsx: 3 steps) ----------
-  // dw = { bulk, readOnly, target, step, cfg: {id: {selected, loadingMode, screen, variant}}, settings: {id: {cycleTime, endCycle, fastMode, webrtc}} }
+  // ---------- Deployment drawer (CreateDeployment.jsx) ----------
+  // Today: 3 steps. After change: Deployment Type comes first (4 steps).
+  // dw = { bulk, readOnly, target, kind, step, cfg: {id: {selected, loadingMode, screen, variant}}, settings: {id: {cycleTime, endCycle, fastMode, webrtc}} }
+  var STEP_IDS = after ? ['deployment-type', 'instance-details', 'capture-type', 'instance-settings'] : ['instance-details', 'capture-type', 'instance-settings'];
+  var STEP_LABEL = { 'deployment-type': 'Deployment Type', 'instance-details': 'Instance Details', 'capture-type': 'Capture Type', 'instance-settings': 'Instance Settings' };
+  var LAST = STEP_IDS.length - 1;
+  function stepIndex(id) {
+    if (!after && id === 'deployment-type') id = 'instance-details';
+    var i = STEP_IDS.indexOf(id);
+    return i < 0 ? 0 : i;
+  }
   var dw = null, openSel = null;
+  function curStep() { return STEP_IDS[dw.step]; }
   function screensFor(id) {
     var used = {};
     list().forEach(function (r) { if (r.id !== id && r.status === 'running' && r.screen) used[r.screen] = 1; });
@@ -626,18 +673,19 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     var insts = dw.bulk ? list() : [dw.target];
     return dw.kind === 'inference' && insts.some(function (i) { return i.needsModel; });
   }
-  // After change: Deployment Type radios (shared/ui/Radio.jsx, laid out like FilePaths.jsx:174-197)
-  function kindHTML() {
-    if (!after) return '';
-    var opt = function (k) {
+  // After change, step 1: Deployment Type as two bento cards (radio dot of shared/ui/Radio.jsx)
+  function stepKind() {
+    var card = function (k) {
       var on = dw.kind === k, ro = dw.readOnly;
       var dis = !ro && k === 'inference' && !dw.bulk && dw.target && !canInfer(dw.target);
-      var attrs = dis ? ' data-tip="' + esc(NO_INFERENCE_SHORT[dw.target.models]) + '" id="kindTip"' : ro ? '' : ' data-kind="' + k + '"';
-      return '<div class="ro' + (dis ? ' dis' : '') + (ro ? ' ro-ro' : '') + '"' + attrs + ' role="radio" aria-checked="' + on + '"' + (dis || ro ? ' aria-disabled="true"' : '') + '>' +
-        '<label class="rd' + (on ? ' on' : '') + '"><i></i></label><span>' + esc(KIND_LABEL[k]) + '</span></div>';
+      var attrs = dis ? ' data-tip="' + esc(NO_INFERENCE_SHORT[dw.target.models]) + '" id="kindTip"' : ro ? '' : ' data-kind="' + k + '" tabindex="0"';
+      return '<div class="bc' + (on ? ' on' : '') + (dis ? ' dis' : '') + (ro ? ' ro' : '') + '"' + attrs + ' role="radio" aria-checked="' + on + '"' + (dis || ro ? ' aria-disabled="true"' : '') + '>' +
+        '<label class="rd' + (on ? ' on' : '') + '"><i></i></label>' +
+        '<div class="bc-ic">' + KIND_ICON[k] + '</div>' +
+        '<div class="bc-t">' + esc(KIND_LABEL[k]) + '</div>' +
+        '<p class="bc-d">' + esc(KIND_DESC[k]) + '</p></div>';
     };
-    return '<div class="rg" role="radiogroup" aria-label="Deployment Type"><span class="rg-h">Deployment Type</span>' +
-      '<div class="rg-o">' + opt('inference') + opt('capture') + '</div></div>';
+    return '<div class="bento" role="radiogroup" aria-label="Deployment Type">' + card('inference') + card('capture') + '</div>';
   }
   function step1() {
     var insts = dw.bulk ? list() : [dw.target];
@@ -666,7 +714,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
           ? '<div class="tip-blk" data-tip="' + esc(run ? 'Already deployed — stop it first to change its settings.' : reason) + '"' + tipId + '>' + cb(run, true) + '</div>'
           : cb(!!c.selected, false, ' data-pick="' + inst.id + '"'));
       }
-      // After change: the Models chip sits under the name (a separate column overflows the 56rem drawer).
+      // After change: the Model Status chip sits under the name (a separate column overflows the 56rem drawer).
       h += td('<span class="fw5">' + esc(inst.name) + '</span>' + (run ? '<span class="run-tag">Running</span>' : '') + (after ? '<span style="flex-basis:100%;display:flex;justify-content:center">' + chip(inst) + '</span>' : ''), after ? ' class="wrap"' : '');
       h += td(esc(inst.activeDashboard || '–'));
       h += td(ro ? '<span>' + esc(inst.variant || '–') + '</span>' : selHTML(inst.id + '|variant', [{ id: 'Variant A', name: 'Variant A' }], c.variant, 'w36', 'Select Variant', off));
@@ -681,7 +729,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     }).join('');
     if (!insts.length) body = '<tr>' + td('<span class="td-empty">No instances available.</span>', ' colspan="' + cols.length + '"') + '</tr>';
     var W = { 'Select': 62, 'Instance Name': after ? 150 : 96, 'Active Dashboard': 122, 'Current Variant': 136, 'PLC Name': 84, 'Loading Mode': 136, 'Screen': 136 };
-    return kindHTML() + tableHTML(cols, body, { widths: cols.map(function (c) { return W[c.t]; }) });
+    return tableHTML(cols, body, { widths: cols.map(function (c) { return W[c.t]; }) });
   }
   function chosen() {
     if (dw.readOnly) return [dw.target];
@@ -689,12 +737,19 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     return list().filter(function (i) { return dw.cfg[i.id] && dw.cfg[i.id].selected; });
   }
   function step2() {
+    // After change: per-capture Deployment Type (Capture and inference only), and each instance's Model Status chip.
+    var dtOn = after && dw.kind === 'inference';
+    var heads = [{ t: 'Variant' }, { t: 'Capture' }].concat(dtOn ? [{ t: 'Deployment Type', tip: DT_TIP }] : [], [
+      { t: 'Trigger Type', tip: 'How the camera is triggered: Hardware, Software or Streaming. Set in Capture Configuration.' },
+      { t: 'Trigger Event', tip: 'What fires the capture, e.g. a camera line, a PLC read, a dashboard button or an internal action.' }]);
     return '<div>' + chosen().map(function (inst) {
-      var rows = CAPTURES.map(function (c) { return '<tr>' + td(esc(c.variant)) + td(esc(c.capture)) + td('<span>' + esc(c.type) + '</span>') + td('<span>' + esc(c.event) + '</span>') + '</tr>'; }).join('');
-      return '<div class="cap-blk"><div class="cap-h"><span>' + esc(inst.name) + '</span></div>' +
-        tableHTML([{ t: 'Variant' }, { t: 'Capture' },
-          { t: 'Trigger Type', tip: 'How the camera is triggered: Hardware, Software or Streaming. Set in Capture Configuration.' },
-          { t: 'Trigger Event', tip: 'What fires the capture, e.g. a camera line, a PLC read, a dashboard button or an internal action.' }], rows, {}) + '</div>';
+      var rows = CAPTURES.map(function (c) {
+        return '<tr>' + td(esc(c.variant)) + td(esc(c.capture)) +
+          (dtOn ? td(captureInfers(inst, c) ? '<span>' + esc(KIND_LABEL.inference) + '</span>' : '<span class="tag-oc">' + esc(KIND_LABEL.capture) + '</span>') : '') +
+          td('<span>' + esc(c.type) + '</span>') + td('<span>' + esc(c.event) + '</span>') + '</tr>';
+      }).join('');
+      return '<div class="cap-blk"><div class="cap-h"><span>' + esc(inst.name) + '</span>' + (after ? chip(inst) : '') + '</div>' +
+        tableHTML(heads, rows, {}) + '</div>';
     }).join('') + '</div>';
   }
   function step3() {
@@ -716,7 +771,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   }
   function nextDisabled() {
     if (dw.readOnly) return false;
-    if (dw.step === 0) {
+    if (curStep() === 'instance-details') {
       if (dw.bulk) {
         var sel = chosen();
         return !sel.length || sel.some(function (i) { return !dw.cfg[i.id].screen; });
@@ -732,29 +787,36 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     hideTip(); closeSel();
     if (!dw) { document.getElementById('drawerRoot').innerHTML = ''; syncSwitch(); return; }
     var title = dw.readOnly ? 'View ' + dw.target.name : dw.bulk ? 'Deploy Instances' : 'Deploy ' + dw.target.name;
-    var s = dw.step;
-    var stp = function (n, label) { return '<div class="stp' + (s === n ? ' on' : '') + '"><div class="c">' + (n + 1) + '</div><span class="l">' + label + '</span></div>'; };
+    var s = dw.step, cur = curStep();
+    var stepper = STEP_IDS.map(function (id, n) {
+      return (n ? '<div class="ln"></div>' : '') + '<div class="stp' + (s === n ? ' on' : '') + '"><div class="c">' + (n + 1) + '</div><span class="l">' + STEP_LABEL[id] + '</span></div>';
+    }).join('');
     var footer = '<div class="ft"><button type="button" class="b b-border b-lg w24" data-dw="cancel">Cancel</button><div class="ft-r">' +
       (s > 0 ? '<button type="button" class="b b-border b-lg w24" data-dw="back">Back</button>' : '') +
-      (s < 2 ? '<button type="button" class="b b-pri b-lg w24" data-dw="next"' + (nextDisabled() ? ' disabled' : '') + '>Next</button>' : '') +
-      (s === 2 && !dw.readOnly ? '<button type="button" class="b b-pri b-lg w24" data-dw="deploy"' + (deployDisabled() ? ' disabled' : '') + '>Deploy</button>' : '') +
+      (s < LAST ? '<button type="button" class="b b-pri b-lg w24" data-dw="next"' + (nextDisabled() ? ' disabled' : '') + '>Next</button>' : '') +
+      (s === LAST && !dw.readOnly ? '<button type="button" class="b b-pri b-lg w24" data-dw="deploy"' + (deployDisabled() ? ' disabled' : '') + '>Deploy</button>' : '') +
       '</div></div>';
+    var content = cur === 'deployment-type' ? stepKind() : cur === 'instance-details' ? step1() : cur === 'capture-type' ? step2() : step3();
     var h = '<div class="dr-bd" data-dw="cancel"></div><div class="dr" role="dialog" aria-label="' + esc(title) + '">' +
       '<div class="dr-h">' + esc(title) + '<span data-dw="cancel">' + CLOSE + '</span></div>' +
-      '<div class="dr-b"><div class="col-h"><div class="steps-w"><div class="steps">' +
-      stp(0, 'Instance Details') + '<div class="ln"></div>' + stp(1, 'Capture Type') + '<div class="ln"></div>' + stp(2, 'Instance Settings') +
-      '</div></div><div class="stc">' + (s === 0 ? step1() : s === 1 ? step2() : step3()) + '</div></div></div>' +
+      '<div class="dr-b"><div class="col-h"><div class="steps-w"><div class="steps">' + stepper +
+      '</div></div><div class="stc">' + content + '</div></div></div>' +
       '<div class="dr-f">' + footer + '</div></div>';
     document.getElementById('drawerRoot').innerHTML = h;
     syncSwitch();
     sizeColumns();
-    if (forceTip && s === 0) { var o = document.getElementById('kindTip') || document.getElementById('selTip'); if (o) showTip(o); }
+    if (forceTip) {
+      var o = cur === 'deployment-type' ? document.getElementById('kindTip') : cur === 'instance-details' ? document.getElementById('selTip') : null;
+      if (o) showTip(o);
+    }
   }
-  // opts: { bulk, readOnly, target, kind, pick: [ids ticked with a screen, cycle time and Instance level], instant }
+  // opts: { bulk, readOnly, target, kind, step, pick: [ids ticked with a screen, cycle time and Instance level], instant }
   function openDrawer(opts) {
     dw = { bulk: !!opts.bulk, readOnly: !!opts.readOnly, target: opts.target || null, step: 0, cfg: {}, settings: {}, kind: opts.kind || 'inference' };
-    if (dw.readOnly) dw.kind = dw.target.kind || 'inference';
+    if (!after) dw.kind = 'inference';
+    else if (dw.readOnly) dw.kind = dw.target.kind || 'inference';
     else if (!dw.bulk && dw.target && !canInfer(dw.target)) dw.kind = 'capture';
+    if (opts.step) dw.step = stepIndex(opts.step);
     var pick = opts.pick || [];
     if (dw.bulk) {
       list().forEach(function (i) { if (i.status !== 'running') dw.cfg[i.id] = { selected: false, loadingMode: 0, screen: null, variant: 'Variant A' }; });
@@ -799,19 +861,17 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   }
   document.addEventListener('mousedown', function (e) { if (openSel && !e.target.closest('.sel')) closeSel(); });
 
+  function pickKind(k) {
+    if (k === dw.kind) return;
+    dw.kind = k;
+    if (k === 'inference') list().forEach(function (i) { if (!canInfer(i) && dw.cfg[i.id]) dw.cfg[i.id].selected = false; });
+    renderDrawer();
+  }
   document.getElementById('drawerRoot').addEventListener('click', function (e) {
     var sel = e.target.closest('[data-sel]');
     if (sel) { if (!sel.disabled) { if (openSel) closeSel(); else openSelect(sel); } return; }
     var kd = e.target.closest('[data-kind]');
-    if (kd) {
-      var k = kd.getAttribute('data-kind');
-      if (k !== dw.kind) {
-        dw.kind = k;
-        if (k === 'inference') list().forEach(function (i) { if (!canInfer(i) && dw.cfg[i.id]) dw.cfg[i.id].selected = false; });
-        renderDrawer();
-      }
-      return;
-    }
+    if (kd) { pickKind(kd.getAttribute('data-kind')); return; }
     var pick = e.target.closest('[data-pick]');
     if (pick) { var c = dw.cfg[pick.getAttribute('data-pick')]; c.selected = !c.selected; renderDrawer(); return; }
     var set = e.target.closest('[data-set]');
@@ -823,10 +883,14 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     else if (act === 'back') { dw.step = Math.max(dw.step - 1, 0); renderDrawer(); }
     else if (act === 'next') {
       if (nextDisabled()) return;
-      if (dw.step === 0 && !dw.readOnly) { loader('Loading capture configuration...'); dw.step = 1; setTimeout(function () { loader(null); renderDrawer(); }, 300); return; }
-      dw.step += 1; renderDrawer();
+      if (curStep() === 'instance-details' && !dw.readOnly) { loader('Loading capture configuration...'); dw.step += 1; setTimeout(function () { loader(null); renderDrawer(); }, 300); return; }
+      dw.step = Math.min(dw.step + 1, LAST); renderDrawer();
     }
     else if (act === 'deploy') deploy();
+  });
+  document.getElementById('drawerRoot').addEventListener('keydown', function (e) {
+    var kd = e.target.closest && e.target.closest('[data-kind]');
+    if (kd && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickKind(kd.getAttribute('data-kind')); }
   });
   document.getElementById('drawerRoot').addEventListener('input', function (e) {
     var i = e.target.closest('[data-ct]');
@@ -851,18 +915,21 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
       setTimeout(function () { loader(null); toast('err', failMsg(bad.map(function (p) { return p.inst.name; }))); }, 700);
       return;
     }
-    if (kind === 'capture') {
-      var sh = readShared();
-      var sel = dw.bulk ? ids : (sh.capture.selected || []).filter(function (id) { return ids.indexOf(id) < 0; }).concat(ids);
-      writeShared({ capture: { selected: sel } });
-      if (dw.bulk && goToStep('edge-deployed-capture')) return;
-    } else {
-      var lm = {};
-      picked.forEach(function (p) { if (!(after && !p.inst.needsModel)) lm[p.inst.id] = p.loadingMode; });
-      if (dw.bulk) writeShared({ inference: { selected: ids, loadingMode: lm } });
-      if (dw.bulk && goToStep('edge-deployed-inference')) return;
+    // Stage "none" is the walk's own deploy: a bulk deploy stores the picks and moves the workflow on.
+    if (stage === 'none') {
+      if (kind === 'capture') {
+        var sh = readShared();
+        var sel = dw.bulk ? ids : (((sh.capture || {}).selected) || []).filter(function (id) { return ids.indexOf(id) < 0; }).concat(ids);
+        writeShared({ capture: { selected: sel } });
+        if (dw.bulk && goToStep('edge-deployed-capture')) return;
+      } else if (dw.bulk) {
+        var lm = {};
+        picked.forEach(function (p) { if (!(after && !p.inst.needsModel)) lm[p.inst.id] = p.loadingMode; });
+        writeShared({ inference: { selected: ids, loadingMode: lm } });
+        if (goToStep('edge-deployed-inference')) return;
+      }
     }
-    // Row "Deploy" (one instance), or opened on its own: play the deployment out on this page.
+    // Row "Deploy", stage some / all, or opened on its own: play the deployment out on this page.
     setTimeout(function () {
       dw = null; renderDrawer();
       picked.forEach(function (p) { p.inst.status = 'deploying'; });
@@ -870,23 +937,35 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
       loader('Checking deployment health...');
       setTimeout(function () {
         loader(null);
-        picked.forEach(function (p) {
-          p.inst.status = 'running'; p.inst.kind = kind; p.inst.loadingMode = kind === 'capture' || (after && !p.inst.needsModel) ? null : p.loadingMode;
-          p.inst.screen = p.screen; p.inst.cycleTime = p.cycleTime;
-        });
-        toast('ok', 'Deployed.');
+        // Today the deploy check skips empty model slots (failure/modelFilesCheck.ts), so an instance
+        // without its models starts and fails once its inspection container tries to load them.
+        if (!after && picked.some(function (p) { return missingToday(p.inst); })) {
+          picked.forEach(function (p) { p.inst.status = 'failed'; });
+          toast('err', failMsgOpen());
+        } else {
+          picked.forEach(function (p) {
+            p.inst.status = 'running'; p.inst.kind = kind; p.inst.loadingMode = kind === 'capture' || (after && !p.inst.needsModel) ? null : p.loadingMode;
+            p.inst.screen = p.screen; p.inst.cycleTime = p.cycleTime;
+          });
+          toast('ok', 'Deployed.');
+        }
         renderPage();
-      }, 1500);
+      }, after ? 1500 : 2200);
     }, 700);
   }
   function failMsg(names) { return 'Deployment failed - Models are missing or not ready for: ' + names.join(', ') + '.'; }
+  function failMsgOpen() { return 'Deployment failed - The model could not be opened for instance-' + L3.instanceId + '.'; }
 
   // ---------- Page actions ----------
   document.querySelector('.main').addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b || b.disabled) return;
     if (b.getAttribute('data-act') === 'bulk') { openDrawer({ bulk: true }); return; }
-    if (b.hasAttribute('data-deploy')) { openDrawer({ target: byId(b.getAttribute('data-deploy')) }); return; }
+    if (b.hasAttribute('data-deploy')) {
+      var t = byId(b.getAttribute('data-deploy'));
+      if (t.status === 'failed') t.status = 'stopped';
+      openDrawer({ target: t }); return;
+    }
     if (b.hasAttribute('data-view')) { openDrawer({ readOnly: true, target: byId(b.getAttribute('data-view')) }); return; }
     if (b.hasAttribute('data-stop')) { confirmModal('Stop Instance', 'Are you sure you want to stop this instance? Other running deployments will not be affected.', 'Stop', function () { stopOne(byId(b.getAttribute('data-stop'))); }); return; }
     if (b.getAttribute('data-act') === 'stopall') { confirmModal('Stop All Deployments', 'Are you sure you want to stop all deployments? This will stop all inferencing.', 'Stop', stopAll); return; }
@@ -953,45 +1032,55 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 
   window.addEventListener('storage', function (e) {
     if (e.key !== null && e.key !== KEY) return;
-    if (state === 'deployed-inference' || state === 'deployed-capture') { applyDeployed(); renderPage(); }
+    syncNames();
+    if (deployedState) applyDeployed();
+    renderPage();
+    if (dw) renderDrawer();
   });
   window.addEventListener('resize', sizeColumns);
 
   // ---------- Initial view ----------
-  // deployed-*: the instances chosen in the earlier step (shared state) are Running.
+  // deployed-*: the instances chosen in the earlier step (shared state) are Running. Returns an error toast, if any.
   function applyDeployed() {
     var sh = readShared();
     list().forEach(function (i) { i.status = 'stopped'; i.kind = null; i.loadingMode = null; i.screen = null; i.cycleTime = null; });
-    var sel, kind = state === 'deployed-capture' ? 'capture' : 'inference';
-    if (kind === 'capture') sel = (sh.capture && sh.capture.selected) || [];
-    else sel = (sh.inference && sh.inference.selected) || [];
-    var badPicked = list().filter(function (i) { return sel.indexOf(i.id) >= 0 && i.models === 'bad'; });
-    // Today: the whole request is rejected when a picked instance has a model that is missing or not ready.
-    if (!after && badPicked.length) return badPicked;
-    sel.forEach(function (id, n) {
-      var i = byId(id);
-      if (!i) return;
+    var kind = state === 'deployed-capture' ? 'capture' : 'inference';
+    var saved = (kind === 'capture' ? sh.capture : sh.inference) || {};
+    var insts = (saved.selected || []).map(byId).filter(Boolean);
+    if (after && kind === 'inference') insts = insts.filter(canInfer);
+    if (!after) {
+      // Today: the whole request is rejected when a picked instance has a model that is missing or not ready...
+      var badPicked = insts.filter(function (i) { return i.models === 'bad'; });
+      if (badPicked.length) return failMsg(badPicked.map(function (i) { return i.name; }));
+      // ...and an instance without its models starts, then fails to open them.
+      if (insts.some(missingToday)) { insts.forEach(function (i) { i.status = 'failed'; }); return failMsgOpen(); }
+    }
+    var lm = saved.loadingMode || {};
+    insts.forEach(function (i, n) {
       i.status = 'running'; i.kind = kind; i.screen = 'Screen ' + (n + 1); i.cycleTime = 3;
-      i.loadingMode = kind === 'capture' ? null : ((sh.inference.loadingMode || {})[id] != null ? sh.inference.loadingMode[id] : 0);
+      i.loadingMode = kind === 'capture' || (after && !i.needsModel) ? null : (lm[i.id] != null ? lm[i.id] : 0);
     });
-    return [];
+    return '';
   }
-  var deployedState = (state === 'deployed-inference' || (state === 'deployed-capture' && after));
-  var rejected = deployedState ? applyDeployed() : [];
+  var deployedState = state === 'deployed-inference' || (state === 'deployed-capture' && after);
+  var deployErr = deployedState ? applyDeployed() : '';
+  if (open === 'failed' && !after && missingToday(L3)) L3.status = 'failed';
   renderPage();
   if (deployedState) {
-    if (rejected.length) toast('err', failMsg(rejected.map(function (i) { return i.name; })), true);
+    if (deployErr) toast('err', deployErr, true);
     else if (open !== 'view' && list().some(function (i) { return i.status === 'running'; })) toast('ok', 'Deployed.', true);
   }
+  if (open === 'failed' && L3.status === 'failed') toast('err', failMsgOpen(), true);
   if (open === 'create') {
     var kind0 = after ? kindParam : 'inference';
-    openDrawer({ bulk: true, instant: true, kind: kind0, pick: kind0 === 'capture' ? ['line-3', 'line-4'] : ['line-1', 'line-2'] });
+    var pick0 = kind0 === 'capture' ? ['line-3', 'line-4'] : stage === 'none' ? ['line-2', 'line-6'] : ['line-2', 'line-3'];
+    openDrawer({ bulk: true, instant: true, kind: kind0, pick: pick0, step: stepParam });
   } else if (open === 'deploy') {
     var tgt = byId(targetParam) || byId('line-4');
-    openDrawer({ target: tgt, instant: true, pick: [tgt.id] });
+    openDrawer({ target: tgt, instant: true, pick: [tgt.id], step: stepParam });
   } else if (open === 'view') {
     var v = list().filter(function (i) { return i.status === 'running'; })[0];
-    if (v) openDrawer({ readOnly: true, target: v, instant: true });
+    if (v) openDrawer({ readOnly: true, target: v, instant: true, step: stepParam });
   }
 })();
 </script>
