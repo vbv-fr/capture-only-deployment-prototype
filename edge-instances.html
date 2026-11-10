@@ -179,6 +179,7 @@ button.mchip:hover{filter:brightness(.96)}
 .ch-some{background:#fefce8;color:#a16207;border-color:#fef08a}
 .ch-none{background:#f3f4f6;color:#6b7280;border-color:#e5e7eb}
 .ch-bad{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.ch-nr{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
 /* Row greyed while a model isn't Completed (InstanceTable.jsx:339,399 "cursor-not-allowed bg-gray-100") */
 .tbl tbody tr.row-off,.tbl tbody tr.row-off:hover{background:#f3f4f6;cursor:not-allowed}
 /* Model Status chip popup: the instance page's Model - Module Mapping table (ModelModuleMappingTable.jsx) */
@@ -543,16 +544,16 @@ button.mchip:hover{filter:brightness(.96)}
 
   // ---------- Model Status of an instance ----------
   function modulesOf(i) { return i.noModules ? [] : i.modules || MODULES; }
-  // Incorrect if any model fails a check; else All (also when no module needs a model); else No models; else n of m.
+  // No models required when no module needs a model; else Incorrect if any model fails a check; else All; else No models; else n of m.
   function modelSummary(i) {
     var mods = modulesOf(i), total = mods.length, have = 0, bad = 0;
     mods.forEach(function (x) { var v = i.models[x.key]; if (v !== 'none') have++; if (v !== 'none' && v !== 'ready') bad++; });
-    var status = bad ? 'incorrect' : have === total ? 'all' : have === 0 ? 'none' : 'some';
+    var status = !total ? 'notneeded' : bad ? 'incorrect' : have === total ? 'all' : have === 0 ? 'none' : 'some';
     return { status: status, have: have, total: total };
   }
-  var CHIP = { all: 'ch-all', some: 'ch-some', none: 'ch-none', incorrect: 'ch-bad' };
+  var CHIP = { all: 'ch-all', some: 'ch-some', none: 'ch-none', incorrect: 'ch-bad', notneeded: 'ch-nr' };
   function chipLabel(s) {
-    return s.status === 'all' ? 'All models present' : s.status === 'some' ? s.have + ' of ' + s.total + ' models present'
+    return s.status === 'notneeded' ? 'No models required' : s.status === 'all' ? 'All models present' : s.status === 'some' ? s.have + ' of ' + s.total + ' models present'
       : s.status === 'none' ? 'No models' : 'Incorrect models';
   }
   function chipHTML(i, ref) {
@@ -630,8 +631,8 @@ button.mchip:hover{filter:brightness(.96)}
     'Shared configs (camera configs, capture positions) will be deleted and re-created. This affects all instances on this edge.',
     'If camera config IDs have changed, re-upload the first instance as well.'
   ];
-  var LOCKED_NONE = 'Edge testing and Capture and Inference deployment stay locked until all models are added.';
-  var LOCKED_SOME = 'Captures missing models can\'t be tested. Capture and Inference deployment stays locked until all models are added.';
+  var LOCKED_NONE = 'Edge testing and Inferencing deployment stay locked until all models are added.';
+  var LOCKED_SOME = 'Captures missing models can\'t be tested. Inferencing deployment stays locked until all models are added.';
 
   function validate(p, target) {
     var errors = [], warnings = [];

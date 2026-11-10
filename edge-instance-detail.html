@@ -700,7 +700,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   });
   var dep = document.querySelector('.sb a[aria-label="Deployments"]');
   if (dep) dep.addEventListener('click', function () {
-    if (!nav('edge-deploy')) location.href = 'edge-deploy.html?state=' + state + '&mode=' + mode;
+    if (!nav('edge-inference-instances')) location.href = 'edge-deploy.html?state=' + state + '&mode=' + mode;
   });
 
   // ---------- Prototype switch ----------

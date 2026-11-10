@@ -543,8 +543,9 @@ html.in-shell .pctl{display:none!important}
     outcome: OUTCOME_OPTIONS.map(function (o) { return o.id; }),
     className: [],
     enabledFilters: {},
+    // ?state=inspected-only: range covers 8 Nov only, before any Only Capture run
     startDate: at(8, 0, 0, 0),
-    endDate: new Date(2026, 10, 9, 23, 59, 59, 999),
+    endDate: q.get('state') === 'inspected-only' ? new Date(2026, 10, 8, 23, 59, 59, 999) : new Date(2026, 10, 9, 23, 59, 59, 999),
     search: '',
     cycleCols: DEFAULT_COLUMN_KEYS.slice(),
     minuteCols: DEFAULT_MINUTE_KEYS.slice(),
@@ -941,7 +942,9 @@ html.in-shell .pctl{display:none!important}
   function renderMinuteTable(data, emptyMessage) {
     var map = {};
     MINUTE_COLUMNS.forEach(function (c) { map[c.key] = c.label; });
-    var cols = st.minuteCols.filter(function (k) { return map[k]; });
+    // After change: "Not inspected" shows only when the loaded minutes include Only Capture cycles.
+    var anyNi = data.some(function (d) { return d.notInspected > 0; });
+    var cols = st.minuteCols.filter(function (k) { return map[k] && (k !== 'notInspected' || anyNi); });
     var widths = colWidths(cols.length);
     var h = '<div class="rt"><div class="rt-sc"><div class="tw"><div style="width:100%"><table class="tbl"><colgroup>' +
       widths.map(function (w) { return '<col style="width:' + w + 'px">'; }).join('') + '</colgroup>' +

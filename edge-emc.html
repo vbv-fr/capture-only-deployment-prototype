@@ -1198,7 +1198,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     var a = e.target.closest('[data-act]');
     if (!a || a.disabled) return;
     var act = a.getAttribute('data-act'), b = cur && cur.beads ? activeBead() : null;
-    if (act === 'godeploy') { e.preventDefault(); nav('edge-deploy-inference'); return; }
+    if (act === 'godeploy') { e.preventDefault(); nav('edge-inference-instances'); return; }
     if (act === 'banner-x') { bead.banner = false; render(); return; }
     if (act === 'eye') { bead.showWidth = !bead.showWidth; refreshBead(); return; }
     if (act === 'boxes') { bead.showBoxes = !bead.showBoxes; refreshBead(); return; }
@@ -1251,7 +1251,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     render();
     toast('Changes saved');
     toast('Module Configuration updated and deployment reloaded.');
-    setTimeout(function () { nav(modelsParam === 'some' ? 'edge-test-some' : 'edge-deploy-inference'); }, 1200);
+    setTimeout(function () { nav(modelsParam === 'some' ? 'edge-test-some' : 'edge-image-saving'); }, 1200);
   }
 
   // ---------- Modals ----------
