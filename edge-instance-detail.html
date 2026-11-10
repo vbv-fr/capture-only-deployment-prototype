@@ -535,7 +535,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     });
   }
 
-  // ---------- Model - Module Mapping (ModelModuleMappingTable.jsx) ----------
+  // ---------- Model - Module Mapping (ModelModuleMappingTable.jsx); After drops the "n modules" chip ----------
   function mappingTable() {
     var headers = [{ t: 'Model Name', tip: 'AI model and its classes.' }, { t: 'Variant' }, { t: 'Capture' }, { t: 'Modules', tip: 'Modules that use this model.' }];
     var body = '', idx = 0;
@@ -544,25 +544,20 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
       body += '<tr class="' + (idx++ % 2 === 0 ? 'row-alt' : '') + '">' +
         td('<div class="mm-cell"><span class="mm-name">' + esc(m.model) + '</span>' + (bad(m) ? '<span class="mm-bad">' + esc(modStatus(m.mod)) + '</span>' : '') + '<div class="mm-cls">' +
           m.classes.map(function (c) { return '<span class="chip-cls">' + esc(c) + '</span>'; }).join('') +
-          '</div><span class="chip-mods">1 modules</span></div>') +
+          '</div>' + (mode === 'after' ? '' : '<span class="chip-mods">1 modules</span>') + '</div>') +
         td(esc(m.variant), ' class="g700"') + td(esc(m.capture), ' class="g700"') +
         td('<div class="trunc">' + esc(m.module) + '</div>', ' class="g700"') + '</tr>';
     });
     if (locked) {
-      // After: modules whose model slot is empty are grouped under one "not added" entry, same grouping as a model.
-      var byCap = {};
+      // After: each module whose model slot is empty is its own "Not added yet" row (no "n modules" chip).
+      var seen = {};
       MAPPINGS.filter(function (m) { return !hasModel(m); }).forEach(function (m) {
-        byCap[m.capture] = byCap[m.capture] || [];
-        if (byCap[m.capture].indexOf(m.module) < 0) byCap[m.capture].push(m.module);
-      });
-      var caps = Object.keys(byCap), total = caps.reduce(function (n, c) { return n + byCap[c].length; }, 0);
-      var cls = idx++ % 2 === 0 ? 'row-alt' : '';
-      caps.forEach(function (c, ci) {
-        body += '<tr class="' + cls + '">' +
-          (ci === 0 ? td('<div class="mm-cell"><span class="mm-name none">Not added yet</span><div class="mm-cls"></div><span class="chip-mods">' + total + ' modules</span></div>', ' rowspan="' + caps.length + '"') +
-            td('Variant A', ' rowspan="' + caps.length + '" class="g700"') : '') +
-          td(esc(c), ' class="g700"') +
-          td('<div class="trunc">' + esc(byCap[c].join(', ')) + '</div>', ' class="g700"') + '</tr>';
+        if (seen[m.module]) return;
+        seen[m.module] = 1;
+        body += '<tr class="' + (idx++ % 2 === 0 ? 'row-alt' : '') + '">' +
+          td('<div class="mm-cell"><span class="mm-name none">Not added yet</span></div>') +
+          td(esc(m.variant), ' class="g700"') + td(esc(m.capture), ' class="g700"') +
+          td('<div class="trunc">' + esc(m.module) + '</div>', ' class="g700"') + '</tr>';
       });
     }
     if (!body) {

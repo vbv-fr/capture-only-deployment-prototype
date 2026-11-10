@@ -85,7 +85,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 .mchip.some{border-color:#fef08a;background:#fefce8;color:#a16207}
 .mchip.none{border-color:#e5e7eb;background:#f3f4f6;color:#6b7280}
 .mchip.bad{border-color:#fecaca;background:#fef2f2;color:#b91c1c}
-/* "Only capture" tag next to a running instance's name (grey pill) */
+/* "Only Capture" tag next to a running instance's name (grey pill) */
 .tag-oc{display:inline-flex;align-items:center;border-radius:9999px;border:1px solid #e5e7eb;background:#f3f4f6;padding:2px 8px;font-size:12px;line-height:16px;font-weight:500;color:#4b5563;white-space:nowrap}
 .ml2{margin-left:8px}
 .wrap .td-in{flex-wrap:wrap;gap:4px}
@@ -459,13 +459,13 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   function list() { return INSTANCES; }
   var LM = { 0: 'Instance level', 1: 'Variant level', 2: 'Capture group level', 3: 'Capture level' };
   var LOADING_MODES = [{ id: 0, name: 'Instance level' }, { id: 1, name: 'Variant level' }, { id: 3, name: 'Capture level' }];
-  var KIND_LABEL = { inference: 'Capture and inference', capture: 'Only capture' };
+  var KIND_LABEL = { inference: 'Capture and Inference', capture: 'Only Capture' };
   var KIND_DESC = { inference: 'Images are inspected with AI models.', capture: 'Raw images are saved. No AI models are loaded.' };
   // Capture and inference needs every model: only All models present instances can be picked.
   var NO_INFERENCE = {
-    some: 'Not all models are present on this instance. Choose Only capture to deploy it.',
-    none: 'No models on this instance. Choose Only capture to deploy it.',
-    bad: 'Incorrect models on this instance. Choose Only capture to deploy it.'
+    some: 'Not all models are present on this instance. Choose Only Capture to deploy it.',
+    none: 'No models on this instance. Choose Only Capture to deploy it.',
+    bad: 'Incorrect models on this instance. Choose Only Capture to deploy it.'
   };
   var NO_INFERENCE_SHORT = { some: 'Not all models are present on this instance.', none: 'No models on this instance.', bad: 'Incorrect models on this instance.' };
   function canInfer(inst) { return inst.models === 'all'; }
@@ -579,7 +579,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
       }
     });
   }
-  function tag(inst) { return after && inst.status === 'running' && inst.kind === 'capture' ? '<span class="tag-oc ml2">Only capture</span>' : ''; }
+  function tag(inst) { return after && inst.status === 'running' && inst.kind === 'capture' ? '<span class="tag-oc ml2">Only Capture</span>' : ''; }
 
   // ---------- Page (index.jsx + DeploymentInstanceRow.jsx) ----------
   var TIPS = {

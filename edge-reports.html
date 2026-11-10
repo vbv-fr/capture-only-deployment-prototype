@@ -854,7 +854,7 @@ html.in-shell .pctl{display:none!important}
         return esc(v);
       }
       case 'resultImages':
-        if (AFTER && outer.notInspected) return '<span class="ni-t">Not inspected</span>';
+        if (AFTER && outer.notInspected) return '<span class="res ni">Not inspected</span>';   // same look as Overall Result
         return resultImagesFor(outer).length ? '<button type="button" class="lnk" data-view="sa" data-row="' + ri + '">View Images </button>' : 'N/A';
       case 'rawImages':
         return rawImagesFor(outer).length ? '<button type="button" class="lnk" data-view="raw" data-row="' + ri + '">View Raw Images</button>' : 'N/A';

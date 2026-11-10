@@ -516,7 +516,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
         '</thead>' +
         '<tbody>' + ROWS.map(rowHTML).join('') + '</tbody>' +
         '</table></div></div></div>' +
-        (mode === 'after' ? '<p class="tbl-note">Note: For Only Capture deployments, raw images are always saved.</p>' : '');
+        (mode === 'after' ? '<p class="tbl-note">Note: For &quot;Only Capture&quot; deployments, raw images are always saved.</p>' : '');
     } else if (!isLoading && selectedInstance) {
       h += '<div class="empty">No capture configurations found for this instance</div>';
     } else if (!isLoading) {

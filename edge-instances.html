@@ -193,7 +193,6 @@ button.mchip:hover{filter:brightness(.96)}
 .mm-bad{font-size:12px;line-height:16px;font-weight:500;color:#dc2626}
 .mm-cls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
 .chip-cls{border-radius:9999px;border:1px solid #e5e7eb;background:#f3f4f6;padding:2px 8px;font-size:10px;line-height:15px;font-weight:500;color:#6b7280}
-.chip-mods{display:inline-block;border-radius:9999px;background:rgb(231 76 60/.1);padding:2px 8px;font-size:10px;line-height:15px;font-weight:500;color:#E74C3C}
 .g700{color:#374151}
 .row-alt{background:rgb(255 247 237/.1)}
 .td-empty{display:block;width:100%;padding:32px 0;text-align:center;color:#6b7280}
@@ -631,8 +630,8 @@ button.mchip:hover{filter:brightness(.96)}
     'Shared configs (camera configs, capture positions) will be deleted and re-created. This affects all instances on this edge.',
     'If camera config IDs have changed, re-upload the first instance as well.'
   ];
-  var LOCKED_NONE = 'Edge testing and Capture and inference deployment stay locked until all models are added.';
-  var LOCKED_SOME = 'Captures missing models can\'t be tested. Capture and inference deployment stays locked until all models are added.';
+  var LOCKED_NONE = 'Edge testing and Capture and Inference deployment stay locked until all models are added.';
+  var LOCKED_SOME = 'Captures missing models can\'t be tested. Capture and Inference deployment stays locked until all models are added.';
 
   function validate(p, target) {
     var errors = [], warnings = [];
@@ -1008,7 +1007,8 @@ button.mchip:hover{filter:brightness(.96)}
     sizeColumns();
   }
   // ---------- Model Status chip popup (new): the instance page's Model - Module Mapping table ----------
-  // Rows grouped by model; modules with an empty slot grouped under "Not added yet"; a model failing an Edge check shows why.
+  // One row per model; each module with an empty slot is its own "Not added yet" row; a model failing an Edge check shows why.
+  // No "n modules" chip: the Modules column already names them.
   var modelsRef = null;
   function openModels(ref) {
     var i = inst(ref), mods = modulesOf(i), body = '', idx = 0;
@@ -1019,18 +1019,14 @@ button.mchip:hover{filter:brightness(.96)}
       m.models.forEach(function (n) {
         body += '<tr class="' + (idx++ % 2 === 0 ? 'row-alt' : '') + '">' +
           td('<div class="mm-cell"><span class="mm-name">' + esc(n + i.sfx) + '</span>' + (v !== 'ready' ? '<span class="mm-bad">' + esc(v) + '</span>' : '') +
-            '<div class="mm-cls">' + m.classes.map(function (c) { return '<span class="chip-cls">' + esc(c) + '</span>'; }).join('') + '</div><span class="chip-mods">1 modules</span></div>') +
+            '<div class="mm-cls">' + m.classes.map(function (c) { return '<span class="chip-cls">' + esc(c) + '</span>'; }).join('') + '</div></div>') +
           td('Variant A', ' class="g700"') + td(esc(m.capture), ' class="g700"') + td(esc(m.module), ' class="g700"') + '</tr>';
       });
     });
-    var byCap = {};
-    mods.filter(function (m) { return i.models[m.key] === 'none'; }).forEach(function (m) { (byCap[m.capture] = byCap[m.capture] || []).push(m.module); });
-    var caps = Object.keys(byCap), total = caps.reduce(function (n, c) { return n + byCap[c].length; }, 0), cls = idx % 2 === 0 ? 'row-alt' : '';
-    caps.forEach(function (c, ci) {
-      body += '<tr class="' + cls + '">' +
-        (ci === 0 ? td('<div class="mm-cell"><span class="mm-name none">Not added yet</span><div class="mm-cls"></div><span class="chip-mods">' + total + ' modules</span></div>', ' rowspan="' + caps.length + '"') +
-          td('Variant A', ' rowspan="' + caps.length + '" class="g700"') : '') +
-        td(esc(c), ' class="g700"') + td(esc(byCap[c].join(', ')), ' class="g700"') + '</tr>';
+    mods.filter(function (m) { return i.models[m.key] === 'none'; }).forEach(function (m) {
+      body += '<tr class="' + (idx++ % 2 === 0 ? 'row-alt' : '') + '">' +
+        td('<div class="mm-cell"><span class="mm-name none">Not added yet</span></div>') +
+        td('Variant A', ' class="g700"') + td(esc(m.capture), ' class="g700"') + td(esc(m.module), ' class="g700"') + '</tr>';
     });
     if (!body) body = '<tr><td colspan="4"><div class="td-in"><span class="td-empty">No models required</span></div></td></tr>';
     document.getElementById('modalRoot').innerHTML =
