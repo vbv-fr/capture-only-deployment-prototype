@@ -149,6 +149,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 .qi{width:64px}
 .rs:focus,.qi:focus{outline:none;box-shadow:0 0 0 1px #f97316}
 .pct{font-size:14px;line-height:20px;color:#000}
+.tbl-note{margin-top:8px;font-size:14px;line-height:20px;color:#6b7280}
 .empty{text-align:center;padding:40px 0;color:#9ca3af;border:1px dashed #e5e7eb;border-radius:6px}
 
 /* ProjectCreateLoader (shared/ui/ProjectCreateLoader.jsx + shared/styles/loader.css) */
@@ -339,12 +340,11 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 (function () {
   'use strict';
 
-  // ---------- ?mode=today|after (default after), ?tip=1 ----------
+  // ---------- ?mode=today|after (default after) ----------
   var inShell = false;
   try { inShell = window.self !== window.top; } catch (e) { inShell = true; }
   var params = new URLSearchParams(location.search);
   var mode = params.get('mode') === 'today' ? 'today' : 'after';
-  var tipParam = params.get('tip') === '1';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -365,7 +365,6 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     colMode: 'Turn image saving on, and choose OK, NG or both.',
     colResolution: 'Size of the saved image: full, 1/2, 1/4 or 1/8.',
     colQuality: 'JPEG quality, 1-100%. Lower uses less space.',
-    rawCapture: 'For Only capture deployments, raw images are always saved.',
     reset: 'Discard unsaved changes on this page.',
     resetNoChanges: 'No changes to reset.',
     save: 'Save changes. A running deployment is reloaded to apply them.',
@@ -506,9 +505,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
         '<th rowspan="2" class="th-1 br">Variant</th>' +
         '<th rowspan="2" class="th-1 br">Capture</th>' +
         '<th colspan="3" class="th-g br bb">Analysed Image</th>' +
-        '<th colspan="1" class="th-g" id="thRaw">' + (mode === 'after'
-          ? '<span class="ifl">Raw Image' + info(TIP.rawCapture, 16, true) + '</span>'
-          : 'Raw Image') + '</th>' +
+        '<th colspan="1" class="th-g">Raw Image</th>' +
         '</tr>' +
         '<tr class="hr">' +
         '<th class="th-2 br"><span class="ifl">Image Saving Mode' + info(TIP.colMode, 16, true) + '</span></th>' +
@@ -518,7 +515,8 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
         '</tr>' +
         '</thead>' +
         '<tbody>' + ROWS.map(rowHTML).join('') + '</tbody>' +
-        '</table></div></div></div>';
+        '</table></div></div></div>' +
+        (mode === 'after' ? '<p class="tbl-note">Note: For Only Capture deployments, raw images are always saved.</p>' : '');
     } else if (!isLoading && selectedInstance) {
       h += '<div class="empty">No capture configurations found for this instance</div>';
     } else if (!isLoading) {
@@ -740,13 +738,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   });
 
   render();
-  function showTip() {
-    if (!tipParam || mode !== 'after') return;
-    var w = document.querySelector('#thRaw .tip');
-    if (w) { tipShow(w); tipPinned = true; }
-  }
-  showTip();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { sizeColumns(); if (tipPinned) showTip(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { sizeColumns(); });
 })();
 </script>
 </body>

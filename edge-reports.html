@@ -193,6 +193,7 @@ table.tbl td.empty{background:#fff;padding:8px 0;text-align:center;font-size:16p
 .res.ps{color:#16a34a}
 .res.fl{color:#ef4444}
 .res.ni{color:#6b7280}
+.ni-t{color:#6b7280}
 .lnk{display:flex;align-items:center;gap:6px;color:#3b82f6;font-weight:500;transition:color .15s}
 .lnk:hover{color:#3730a3}
 .jsn{cursor:pointer;color:#3b82f6;font-weight:500}
@@ -329,6 +330,7 @@ html.in-shell .pctl{display:none!important}
   var mode = q.get('mode') === 'today' ? 'today' : 'after';
   var AFTER = mode === 'after';
   var openParam = q.get('open') || '';
+  var viewParam = q.get('view') === 'minute' ? 'minute' : 'cycle';
   var inShell = false; try { inShell = window.self !== window.top; } catch (e) { inShell = true; }
   if (inShell || q.get('shot') === '1') document.documentElement.classList.add('in-shell');
 
@@ -461,6 +463,54 @@ html.in-shell .pctl{display:none!important}
   }
   var ALL_ROWS = buildRows();
 
+  /* ---------- minute-wise sample data (analysis/minute-wise/view shape) ---------- */
+  // en-GB "DD/MM HH:mm → HH:mm", as AnalysisService.formatMinuteRange sends it
+  function fmtMinuteRange(ms) {
+    var s = new Date(ms), e = new Date(ms + 60000);
+    return pad(s.getDate()) + '/' + pad(s.getMonth() + 1) + ' ' + pad(s.getHours()) + ':' + pad(s.getMinutes()) + ' → ' + pad(e.getHours()) + ':' + pad(e.getMinutes());
+  }
+  // One row per (minute, variant), bucketed on cycle end like MinuteSummaryService.addCycleResult.
+  // Today: an Only capture cycle is a Fail. After: it goes to notInspected, not total/pass/fail.
+  function buildMinuteRows() {
+    var map = {}, order = [], names = {};
+    CLASSES.forEach(function (c) { names[c.id] = c.name; });
+    ALL_ROWS.forEach(function (r) {
+      var ms = Math.floor(r.date.getTime() / 60000) * 60000, k = ms + '_' + r.variantId, m = map[k];
+      if (!m) {
+        m = map[k] = { id: k, variantId: r.variantId, variant: r.variant, minuteTimestamp: ms, total: 0, pass: 0, fail: 0, notInspected: 0, reverseJudgement: 0, classes: {}, classOrder: [] };
+        order.push(m);
+      }
+      if (r.notInspected) { m.notInspected++; return; }
+      m.total++;
+      if (r.result) m.pass++; else m.fail++;
+      (r.data || []).forEach(function (inner) {
+        var cr = inner.classResult || {};
+        Object.keys(cr).forEach(function (cid) {
+          if (cid === 'type' || !(cr[cid].predicted_count > 0)) return;
+          if (!(cid in m.classes)) { m.classes[cid] = 0; m.classOrder.push(cid); }
+          m.classes[cid] += cr[cid].predicted_count;
+        });
+      });
+    });
+    return order.map(function (m) {
+      var data = m.classOrder.map(function (cid) {
+        var cr = {}; cr[cid] = { name: names[cid] || cid, predicted_count: m.classes[cid] };
+        return { id: m.id + '_' + cid, classId: cid, classResult: cr };
+      });
+      if (!data.length) data.push({ id: m.id + '_empty', classResult: {} });
+      return {
+        id: m.id, variantId: m.variantId, variant: m.variant, minuteTimestamp: m.minuteTimestamp,
+        timeRange: fmtMinuteRange(m.minuteTimestamp), total: m.total, pass: m.pass, fail: m.fail,
+        notInspected: m.notInspected, user_feedback: String(m.reverseJudgement),
+        defectPercent: m.total > 0 ? Math.round(m.fail / m.total * 100 * 100) / 100 : 0,
+        additional_info: {}, comment: '', data: data
+      };
+    }).sort(function (a, b) {
+      return (b.minuteTimestamp - a.minuteTimestamp) || (a.variantId < b.variantId ? -1 : a.variantId > b.variantId ? 1 : 0);
+    });
+  }
+  var MINUTE_ROWS = buildMinuteRows();
+
   /* ---------- columns.js ---------- */
   var BASE_COLUMNS = [
     { key: 'sno', label: 'S. No.', def: true }, { key: 'timestamp', label: 'Timestamp', def: true },
@@ -477,6 +527,7 @@ html.in-shell .pctl{display:none!important}
     { key: 'pass', label: 'Pass' }, { key: 'fail', label: 'Fail' }, { key: 'userFeedback', label: 'Reverse Judgement' },
     { key: 'defectPercent', label: 'Defect %' }, { key: 'className', label: 'Class Name' }, { key: 'classCount', label: 'Class Count' }
   ];
+  if (AFTER) MINUTE_COLUMNS.splice(5, 0, { key: 'notInspected', label: 'Not inspected' });
   var DEFAULT_COLUMN_KEYS = BASE_COLUMNS.filter(function (c) { return c.def; }).map(function (c) { return c.key; });
   var DEFAULT_MINUTE_KEYS = MINUTE_COLUMNS.map(function (c) { return c.key; });
   var PER_RESULT = { sno: 1, overallResult: 1, variant: 1, userFeedback: 1, additionalInfo: 1, resultImages: 1, rawImages: 1, timestamp: 1, cycleStart: 1, cycleComplete: 1, resultsJson: 1, comment: 1 };
@@ -486,7 +537,7 @@ html.in-shell .pctl{display:none!important}
 
   /* ---------- page state ---------- */
   var st = {
-    tab: 'cycle',
+    tab: viewParam,
     instanceId: 'inst-1',
     variantId: [VARIANT.id],
     outcome: OUTCOME_OPTIONS.map(function (o) { return o.id; }),
@@ -534,6 +585,29 @@ html.in-shell .pctl{display:none!important}
       var fb = r.user_feedback != null ? String(r.user_feedback).trim().toLowerCase() : '';
       if (fb !== '' && fb !== 'null' && fb !== '---') s.userFeedback++;
     });
+    return s;
+  }
+  // /analysis/minute-wise/view: no Outcome filter; no Variant selected = every variant
+  function fetchedMinuteRows() {
+    if (!canFetch()) return [];
+    var from = Math.floor(st.startDate.getTime() / 1000) * 1000, to = Math.floor(st.endDate.getTime() / 1000) * 1000;
+    return MINUTE_ROWS.filter(function (m) {
+      if (m.minuteTimestamp < from || m.minuteTimestamp > to) return false;
+      if (st.variantId.length && st.variantId.indexOf(m.variantId) < 0) return false;
+      if (st.className.length && !m.data.some(function (d) { return d.classId && st.className.indexOf(d.classId) >= 0; })) return false;
+      return true;
+    });
+  }
+  // index.jsx minute search/summary read item.variants, which minute rows do not carry
+  function searchMinuteRows(rows) {
+    var term = st.search.trim().toLowerCase();
+    if (!term) return rows;
+    return rows.filter(function (item) { return String(item.timeRange).toLowerCase().indexOf(term) >= 0; });
+  }
+  function summarizeMinutes(rows) {
+    var s = { total: 0, pass: 0, fail: 0, userFeedback: 0 };
+    if (st.search.trim()) return s;
+    rows.forEach(function (m) { s.total += m.total; s.pass += m.pass; s.fail += m.fail; s.userFeedback += Number(m.user_feedback) || 0; });
     return s;
   }
   function resultWord(r) { return r.notInspected ? 'not inspected' : (r.result ? 'pass' : 'fail'); }
@@ -780,6 +854,7 @@ html.in-shell .pctl{display:none!important}
         return esc(v);
       }
       case 'resultImages':
+        if (AFTER && outer.notInspected) return '<span class="ni-t">Not inspected</span>';
         return resultImagesFor(outer).length ? '<button type="button" class="lnk" data-view="sa" data-row="' + ri + '">View Images </button>' : 'N/A';
       case 'rawImages':
         return rawImagesFor(outer).length ? '<button type="button" class="lnk" data-view="raw" data-row="' + ri + '">View Raw Images</button>' : 'N/A';
@@ -841,19 +916,88 @@ html.in-shell .pctl{display:none!important}
     $('tableArea').innerHTML = h + '</div>';
   }
 
+  /* ---------- MinuteResultTable ---------- */
+  var MINUTE_VARIANT_LEVEL = { variant: 1, total: 1, pass: 1, fail: 1, notInspected: 1, defectPercent: 1, userFeedback: 1 };
+  function minuteVariantCell(key, v) {
+    switch (key) {
+      case 'variant': return esc(v.variant);
+      case 'total': return String(v.total);
+      case 'pass': return String(v.pass);
+      case 'fail': return String(v.fail);
+      case 'notInspected': return '<span class="ni-t">' + v.notInspected + '</span>';
+      case 'defectPercent': return AFTER && !v.total ? '–' : v.defectPercent + '%';
+      case 'userFeedback': return esc(v.user_feedback != null ? v.user_feedback : 'N/A');
+      default: return '';
+    }
+  }
+  function minuteClassCell(key, inner) {
+    var cr = inner.classResult || {};
+    var vals = Object.keys(cr).filter(function (k) { return k !== 'type'; }).map(function (k) {
+      return key === 'className' ? (cr[k] && cr[k].name || '') : (cr[k] && cr[k].predicted_count != null ? cr[k].predicted_count : '');
+    });
+    if (key === 'className') vals = vals.filter(Boolean);
+    return esc(vals.join(', ') || 'N/A');
+  }
+  function renderMinuteTable(data, emptyMessage) {
+    var map = {};
+    MINUTE_COLUMNS.forEach(function (c) { map[c.key] = c.label; });
+    var cols = st.minuteCols.filter(function (k) { return map[k]; });
+    var widths = colWidths(cols.length);
+    var h = '<div class="rt"><div class="rt-sc"><div class="tw"><div style="width:100%"><table class="tbl"><colgroup>' +
+      widths.map(function (w) { return '<col style="width:' + w + 'px">'; }).join('') + '</colgroup>' +
+      '<thead><tr>' + cols.map(function (k) { return '<th scope="col">' + esc(map[k]) + '<div class="rh"></div></th>'; }).join('') + '</tr></thead><tbody>';
+    var groups = [], byMinute = {};
+    data.forEach(function (item) {
+      var k = item.minuteTimestamp;
+      if (!byMinute[k]) { byMinute[k] = { timeRange: item.timeRange, minuteTimestamp: k, variants: [] }; groups.push(byMinute[k]); }
+      byMinute[k].variants.push(item);
+    });
+    groups.forEach(function (g) {
+      var totalRows = g.variants.reduce(function (acc, v) { return acc + Math.max((v.data && v.data.length) || 1, 1); }, 0);
+      var renderedTime = false;
+      g.variants.forEach(function (v) {
+        var nested = v.data && v.data.length ? v.data : [{}];
+        nested.forEach(function (inner, idx) {
+          h += '<tr>' + cols.map(function (k) {
+            if (k === 'timeRange') {
+              if (renderedTime) return '';
+              renderedTime = true;
+              return '<td rowspan="' + totalRows + '"><div>' + esc(g.timeRange) + '</div></td>';
+            }
+            if (MINUTE_VARIANT_LEVEL[k]) {
+              if (idx) return '';
+              return '<td rowspan="' + nested.length + '"><div>' + minuteVariantCell(k, v) + '</div></td>';
+            }
+            if (k === 'className' || k === 'classCount') return '<td><div>' + minuteClassCell(k, inner) + '</div></td>';
+            return '<td><div>N/A</div></td>';
+          }).join('') + '</tr>';
+        });
+      });
+    });
+    if (!data.length) h += '<tr><td class="empty" colspan="' + cols.length + '">' + esc(emptyMessage) + '</td></tr>';
+    h += '</tbody></table></div></div></div>';
+    $('tableArea').innerHTML = h + '</div>';
+  }
+
   /* ---------- render ---------- */
   function render() {
     renderTabs();
     renderToolbar();
     var minute = st.tab === 'minute';
-    var fetched = fetchedRows();
-    var rows = minute ? [] : searchRows(fetched);
-    var s = minute ? { total: 0, pass: 0, fail: 0, userFeedback: 0 } : summarize(rows);
-    renderSummary(s);
     var empty = hasFetched() ? 'No results found.' : 'Select Instance and Variant to load data.';
-    // Pagination counts every cycle row; the summary counts inspected ones only.
-    var totalCount = AFTER ? rows.length : s.total;
-    renderTable(rows, totalCount, empty);
+    if (minute) {
+      var mrows = searchMinuteRows(fetchedMinuteRows());
+      renderSummary(summarizeMinutes(mrows));
+      viewRows = [];
+      renderMinuteTable(mrows, empty);
+    } else {
+      var rows = searchRows(fetchedRows());
+      var s = summarize(rows);
+      renderSummary(s);
+      // Pagination counts every cycle row; the summary counts inspected ones only.
+      var totalCount = AFTER ? rows.length : s.total;
+      renderTable(rows, totalCount, empty);
+    }
     $('ovl').hidden = !(st.open && st.open !== 'time');
     var bs = document.querySelectorAll('#pctl button');
     for (var i = 0; i < bs.length; i++) bs[i].setAttribute('aria-pressed', String(bs[i].getAttribute('data-mode') === mode));
@@ -1170,6 +1314,12 @@ html.in-shell .pctl{display:none!important}
     if (e.target.closest('[data-stop]')) { e.stopPropagation(); return; }
     var b = e.target.closest('[data-tab]'); if (!b) return;
     st.tab = b.getAttribute('data-tab'); st.open = ''; render();
+    try {
+      var p = new URLSearchParams(location.search);
+      if (st.tab === 'minute') p.set('view', 'minute'); else p.delete('view');
+      var qs = p.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+    } catch (err) { /* view stays in page state only */ }
   });
   $('search').addEventListener('input', function () { st.search = this.value; $('searchClr').hidden = !this.value; render(); });
   $('searchClr').addEventListener('click', function () { st.search = ''; $('search').value = ''; this.hidden = true; render(); });
@@ -1284,7 +1434,7 @@ html.in-shell .pctl{display:none!important}
   /* ---------- initial ---------- */
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
-  if (openParam === 'raw' && AFTER) {
+  if (openParam === 'raw' && AFTER && st.tab === 'cycle') {
     var firstNi = -1;
     viewRows.some(function (r, i) { if (r.notInspected) { firstNi = i; return true; } return false; });
     if (firstNi >= 0) openViewer(rawImagesFor(viewRows[firstNi]), 0);

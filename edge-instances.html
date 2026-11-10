@@ -181,16 +181,22 @@ button.mchip:hover{filter:brightness(.96)}
 .ch-bad{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
 /* Row greyed while a model isn't Completed (InstanceTable.jsx:339,399 "cursor-not-allowed bg-gray-100") */
 .tbl tbody tr.row-off,.tbl tbody tr.row-off:hover{background:#f3f4f6;cursor:not-allowed}
-/* Model Status popup */
+/* Model Status chip popup: the instance page's Model - Module Mapping table (ModelModuleMappingTable.jsx) */
 .mdl.mdl-models{width:60%!important;max-width:56rem}
-.ms-sum{display:flex;align-items:center}
+.ms-tbl{border:1px solid #e5e7eb}
 .ms-tbl .tbl tbody tr{cursor:default}
-.mm{display:flex;flex-direction:column;gap:2px;white-space:nowrap}
-.ms-bad,.ms-ok,.ms-none,.ms-nr{white-space:nowrap}
-.ms-ok{color:#16a34a;font-weight:500}
-.ms-none{color:#6b7280}
-.ms-bad{color:#dc2626;font-weight:500}
-.ms-nr{color:#374151}
+.ms-tbl .tbl tbody tr:hover{background:inherit}
+.ms-tbl .tbl td{font-size:14px;line-height:20px}
+.mm-cell{display:flex;width:100%;flex-direction:column;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+.mm-name{font-weight:500;color:#111827}
+.mm-name.none{color:#9ca3af}
+.mm-bad{font-size:12px;line-height:16px;font-weight:500;color:#dc2626}
+.mm-cls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.chip-cls{border-radius:9999px;border:1px solid #e5e7eb;background:#f3f4f6;padding:2px 8px;font-size:10px;line-height:15px;font-weight:500;color:#6b7280}
+.chip-mods{display:inline-block;border-radius:9999px;background:rgb(231 76 60/.1);padding:2px 8px;font-size:10px;line-height:15px;font-weight:500;color:#E74C3C}
+.g700{color:#374151}
+.row-alt{background:rgb(255 247 237/.1)}
+.td-empty{display:block;width:100%;padding:32px 0;text-align:center;color:#6b7280}
 
 /* Error banner (instance/hooks/useInstanceUpload.jsx:204-229) */
 .eb{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:50;max-width:550px;width:90%;display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -417,7 +423,7 @@ button.mchip:hover{filter:brightness(.96)}
 (function () {
   'use strict';
 
-  // ---------- ?mode=today|after (default after), ?state=, ?open=dialog|models-L2|models-L3|models-L4|models-L6 ----------
+  // ---------- ?mode=today|after (default after), ?state=, ?open=dialog|models-L2|models-L3|models-L4|models-L5|models-L6 ----------
   var STATES = ['upload', 'uploaded', 'some-models', 'models', 'wrong-instance', 'missing-config', 'reupload-config', 'reupload-full', 'duplicate-id'];
   var mode = 'after', state = 'upload', openParam = '';
   try {
@@ -473,11 +479,13 @@ button.mchip:hover{filter:brightness(.96)}
   // ---------- Modules of every instance (one recipe, Variant A; Barcode / Code Reader needs no model, so it is not listed) ----------
   var CAPTURES = ['Front View', 'Top View'];
   var MODULES = [
-    { key: 'odc', capture: 'Front View', module: 'Part Presence', models: ['ODC_Front_'] },
-    { key: 'ocr', capture: 'Front View', module: 'Label Text', models: ['OCR-D_Front_', 'OCR-R_Front_'] },
-    { key: 'bead', capture: 'Top View', module: 'Seal Bead', models: ['Bead_Top_'] },
-    { key: 'seg', capture: 'Top View', module: 'Surface Check', models: ['SEG_Top_'] }
+    { key: 'odc', capture: 'Front View', module: 'Part Presence', models: ['ODC_Front_'], classes: ['Bolt', 'Washer', 'Clip'] },
+    { key: 'ocr', capture: 'Front View', module: 'Label Text', models: ['OCR-D_Front_', 'OCR-R_Front_'], classes: [] },
+    { key: 'bead', capture: 'Top View', module: 'Seal Bead', models: ['Bead_Top_'], classes: [] },
+    { key: 'seg', capture: 'Top View', module: 'Surface Check', models: ['SEG_Top_'], classes: ['Scratch', 'Dent'] }
   ];
+  // Line 5's own recipe adds a fifth model-needing module
+  var MODULES_L5 = MODULES.concat([{ key: 'ic', capture: 'Top View', module: 'Connector Check', models: ['IC_Top_'], classes: ['Seated', 'Loose'] }]);
   // Model on each module: 'ready' | 'none' | the check it fails on this Edge (e.g. 'Model file missing')
   function modelsMap(ready) { var o = {}; MODULES.forEach(function (m) { o[m.key] = ready.indexOf(m.key) >= 0 ? 'ready' : 'none'; }); return o; }
   // Line 3's models by stage: Configuration only → some models → all models
@@ -489,6 +497,9 @@ button.mchip:hover{filter:brightness(.96)}
     L2: { id: '5c1e7a92-3f4b-4d8e-9a26-0b7f3c51e8d4', name: 'Line 2 Assembly', teamName: 'Team 1', sfx: '14-10', models: L3_MODELS.all, modelStatus: 0 },
     L4: { id: '9d84b2f0-1c6e-4a37-b5e9-6f0a3d2c8b41', name: 'Line 4 Assembly', teamName: 'Team 1', sfx: '20-10',
       models: { odc: 'ready', ocr: 'ready', bead: 'ready', seg: 'Model file missing' }, modelStatus: 3 },
+    // Line 5 (after change only: today an upload with empty model slots is blocked): 3 of 5, Seal Bead + Surface Check have none
+    L5: { id: 'e2b7c4d9-8a15-4f60-93de-71c0b5a4f2e8', name: 'Line 5 Assembly', teamName: 'Team 1', sfx: '22-10', modules: MODULES_L5,
+      models: { odc: 'ready', ocr: 'ready', bead: 'none', seg: 'none', ic: 'ready' }, modelStatus: 0 },
     // Line 6: captures with only master images / Search Areas, so no module needs a model
     L6: { id: '7a1d3e58-2c9b-4f04-8e6a-b3f90c2d1a67', name: 'Line 6 Assembly', teamName: 'Team 1', sfx: '21-10', models: {}, noModules: true, modelStatus: 0 }
   };
@@ -498,7 +509,7 @@ button.mchip:hover{filter:brightness(.96)}
     return { id: seedUuid(sh.instanceId), name: sh.instanceName, teamName: 'Team 1', sfx: '27-10', models: L3_MODELS[r ? r.stage : 'none'], modelStatus: 0 };
   }
   function inst(ref) { return ref === 'L3' ? L3() : INST[ref]; }
-  var INST_PAGE = { L2: 'line-2', L3: 'line-3', L4: 'line-4', L6: 'line-6' };
+  var INST_PAGE = { L2: 'line-2', L3: 'line-3', L4: 'line-4', L5: 'line-5', L6: 'line-6' };
   var STAGE_PAGE = { none: 'no-models', some: 'some-models', all: 'ready' };
   var REUPLOAD_DAY = state === 'reupload-config' || state === 'reupload-full' || state === 'duplicate-id';
   var T = {
@@ -508,15 +519,17 @@ button.mchip:hover{filter:brightness(.96)}
     l3Some: new Date(2026, 9, 28, 13, 40, 22).getTime(), l3Models: new Date(2026, 9, 28, 16, 5, 12).getTime(),
     l3ReCfg: new Date(2026, 9, 29, 10, 48, 9).getTime(), l3ReFull: new Date(2026, 9, 29, 11, 39, 51).getTime(),
     l4Created: new Date(2026, 9, 20, 12, 5, 51).getTime(), l4Updated: new Date(2026, 9, 24, 14, 27, 9).getTime(),
+    l5Created: new Date(2026, 9, 22, 10, 26, 3).getTime(),
     l6Created: new Date(2026, 9, 21, 9, 12, 47).getTime(), l6Updated: new Date(2026, 9, 21, 9, 12, 47).getTime()
   };
   // Line 2 stays first, so it is still the instance "LIMIT 1" samples (manifestParser.ts:245-296).
-  var ORDER = ['L2', 'L3', 'L4', 'L6'];
+  var ORDER = ['L2', 'L3', 'L4', 'L5', 'L6'];
   var rows = [
     { ref: 'L2', createdAt: T.l2Created, updatedAt: T.l2Updated },
     { ref: 'L4', createdAt: T.l4Created, updatedAt: T.l4Updated },
     { ref: 'L6', createdAt: T.l6Created, updatedAt: T.l6Updated }
   ];
+  if (mode === 'after') rows.splice(2, 0, { ref: 'L5', createdAt: T.l5Created, updatedAt: T.l5Created });
   // stage = Line 3's models on the box: none (Configuration only) | some | all
   function addL3Row(stage, updatedAt) {
     rows.push({ ref: 'L3', createdAt: T.l3Created, updatedAt: updatedAt, stage: stage });
@@ -530,7 +543,7 @@ button.mchip:hover{filter:brightness(.96)}
   function rowById(id) { return rows.filter(function (r) { return inst(r.ref).id === id; })[0] || null; }
 
   // ---------- Model Status of an instance ----------
-  function modulesOf(i) { return i.noModules ? [] : MODULES; }
+  function modulesOf(i) { return i.noModules ? [] : i.modules || MODULES; }
   // Incorrect if any model fails a check; else All (also when no module needs a model); else No models; else n of m.
   function modelSummary(i) {
     var mods = modulesOf(i), total = mods.length, have = 0, bad = 0;
@@ -618,8 +631,8 @@ button.mchip:hover{filter:brightness(.96)}
     'Shared configs (camera configs, capture positions) will be deleted and re-created. This affects all instances on this edge.',
     'If camera config IDs have changed, re-upload the first instance as well.'
   ];
-  var LOCKED_NONE = 'Edge testing stays locked until models are added.';
-  var LOCKED_SOME = 'Captures missing models can\'t be tested and only save raw images.';
+  var LOCKED_NONE = 'Edge testing and Capture and inference deployment stay locked until all models are added.';
+  var LOCKED_SOME = 'Captures missing models can\'t be tested. Capture and inference deployment stays locked until all models are added.';
 
   function validate(p, target) {
     var errors = [], warnings = [];
@@ -994,35 +1007,36 @@ button.mchip:hover{filter:brightness(.96)}
     document.getElementById('modalRoot').innerHTML = h;
     sizeColumns();
   }
-  // ---------- Model Status popup (new): one row per model-needing module, or per capture that needs none ----------
+  // ---------- Model Status chip popup (new): the instance page's Model - Module Mapping table ----------
+  // Rows grouped by model; modules with an empty slot grouped under "Not added yet"; a model failing an Edge check shows why.
   var modelsRef = null;
-  function statusCell(v) {
-    if (v === 'ready') return '<span class="ms-ok">Ready</span>';
-    if (v === 'none') return '<span class="ms-none">No model</span>';
-    return '<span class="ms-bad">' + esc(v) + '</span>';
-  }
   function openModels(ref) {
-    var i = inst(ref), mods = modulesOf(i);
+    var i = inst(ref), mods = modulesOf(i), body = '', idx = 0;
     lastWarn = null; modelsRef = ref;
-    function tr(capture, module, model, status) {
-      return '<tr><td><div class="td-in">Variant A</div></td><td><div class="td-in">' + esc(capture) + '</div></td>' +
-        '<td><div class="td-in">' + esc(module) + '</div></td><td><div class="td-in"><div class="mm">' + model + '</div></div></td>' +
-        '<td><div class="td-in">' + status + '</div></td></tr>';
-    }
-    var body = CAPTURES.map(function (cap) {
-      var ms = mods.filter(function (m) { return m.capture === cap; });
-      if (!ms.length) return tr(cap, '–', '–', '<span class="ms-nr">No models required</span>');
-      return ms.map(function (m) {
-        var v = i.models[m.key];
-        var model = v === 'none' ? '–' : m.models.map(function (n) { return '<div>' + esc(n + i.sfx) + '</div>'; }).join('');
-        return tr(cap, m.module, model, statusCell(v));
-      }).join('');
-    }).join('');
+    function td(inner, attrs) { return '<td' + (attrs || '') + '><div class="td-in">' + inner + '</div></td>'; }
+    mods.filter(function (m) { return i.models[m.key] !== 'none'; }).forEach(function (m) {
+      var v = i.models[m.key];
+      m.models.forEach(function (n) {
+        body += '<tr class="' + (idx++ % 2 === 0 ? 'row-alt' : '') + '">' +
+          td('<div class="mm-cell"><span class="mm-name">' + esc(n + i.sfx) + '</span>' + (v !== 'ready' ? '<span class="mm-bad">' + esc(v) + '</span>' : '') +
+            '<div class="mm-cls">' + m.classes.map(function (c) { return '<span class="chip-cls">' + esc(c) + '</span>'; }).join('') + '</div><span class="chip-mods">1 modules</span></div>') +
+          td('Variant A', ' class="g700"') + td(esc(m.capture), ' class="g700"') + td(esc(m.module), ' class="g700"') + '</tr>';
+      });
+    });
+    var byCap = {};
+    mods.filter(function (m) { return i.models[m.key] === 'none'; }).forEach(function (m) { (byCap[m.capture] = byCap[m.capture] || []).push(m.module); });
+    var caps = Object.keys(byCap), total = caps.reduce(function (n, c) { return n + byCap[c].length; }, 0), cls = idx % 2 === 0 ? 'row-alt' : '';
+    caps.forEach(function (c, ci) {
+      body += '<tr class="' + cls + '">' +
+        (ci === 0 ? td('<div class="mm-cell"><span class="mm-name none">Not added yet</span><div class="mm-cls"></div><span class="chip-mods">' + total + ' modules</span></div>', ' rowspan="' + caps.length + '"') +
+          td('Variant A', ' rowspan="' + caps.length + '" class="g700"') : '') +
+        td(esc(c), ' class="g700"') + td(esc(byCap[c].join(', ')), ' class="g700"') + '</tr>';
+    });
+    if (!body) body = '<tr><td colspan="4"><div class="td-in"><span class="td-empty">No models required</span></div></td></tr>';
     document.getElementById('modalRoot').innerHTML =
       '<div class="ov" data-ov="models" role="dialog" aria-modal="true" aria-labelledby="models-title"><div class="mdl mdl-models"><div class="mdl-in"><div class="iw">' +
-      '<div class="iw-h"><h2 id="models-title">Model Status — ' + esc(i.name) + '</h2><button type="button" class="iw-x" data-m="close">✕</button></div>' +
-      '<div class="ms-sum">' + chipHTML(i) + '</div>' +
-      '<div class="ms-tbl">' + tableHTML(['Variant', 'Capture', 'Module', 'Model', 'Status'], body, 'auto') + '</div>' +
+      '<div class="iw-h"><h2 id="models-title">Model - Module Mapping — ' + esc(i.name) + '</h2><button type="button" class="iw-x" data-m="close">✕</button></div>' +
+      '<div class="ms-tbl">' + tableHTML([{ t: 'Model Name', tip: 'AI model and its classes.' }, { t: 'Variant' }, { t: 'Capture' }, { t: 'Modules', tip: 'Modules that use this model.' }], body, true) + '</div>' +
       '</div></div></div></div>';
     sizeColumns();
   }
@@ -1079,8 +1093,8 @@ button.mchip:hover{filter:brightness(.96)}
     if (state === 'wrong-instance') hooks.tbl.errors = validate(pkgs().l3models, L2).errors;
     if (state === 'missing-config') hooks.top.errors = validate(pkgs().l3models, null).errors;
     renderBanners();
-    // ?open=models-L2|L3|L4|L6 opens that instance's Model Status popup (After, when the instance is on the box)
-    var om = /^models-(L[2346])$/.exec(openParam);
+    // ?open=models-L2|L3|L4|L5|L6 opens that instance's chip popup (After, when the instance is on the box)
+    var om = /^models-(L[23456])$/.exec(openParam);
     if (after && om && rowOf(om[1])) { openModels(om[1]); return; }
     if (openParam !== 'dialog') return;
     // [package, row whose Update is used (null = Add Instance), banner/hook]

@@ -100,20 +100,20 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
 .rd:hover{filter:drop-shadow(0 20px 13px rgb(0 0 0/.03)) drop-shadow(0 8px 5px rgb(0 0 0/.08))}
 .rd i{width:8px;height:8px;border-radius:9999px;background:#fff}
 .rd.on{background:#ff4301}
-/* Deployment Type step: two bento cards */
-.bento{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.bc{position:relative;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;cursor:pointer;text-align:left;transition:border-color .15s,background-color .15s}
+/* Deployment Type step: two full-width bento cards, one per row */
+.bento{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.bc{position:relative;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;cursor:pointer;text-align:left;transition:border-color .15s,background-color .15s}
 .bc:hover{border-color:#d1d5db}
 .bc.on,.bc.on:hover{border-color:#ff4301;box-shadow:0 0 0 1px #ff4301;background:#fff7ed}
 .bc:focus-visible{outline:2px solid #ff4301;outline-offset:2px}
-.bc .rd{position:absolute;top:20px;right:20px}
+.bc .rd{position:absolute;top:50%;right:20px;transform:translateY(-50%)}
 .bc .rd:not(.on){background:#fff}
 .bc.ro,.bc.ro .rd{cursor:default}
 .bc.ro .rd:hover{filter:drop-shadow(0 1px 1px rgb(0 0 0/.05))}
 .bc.dis{opacity:.5;cursor:not-allowed}
 .bc.dis:hover{border-color:#e5e7eb}
 .bc.dis .rd{cursor:not-allowed}
-.bc-ic{display:flex;height:40px;width:40px;align-items:center;justify-content:center;border-radius:8px;background:#fff1eb;color:#ff4301;margin-bottom:12px}
+.bc-ic{display:flex;flex-shrink:0;height:40px;width:40px;align-items:center;justify-content:center;border-radius:8px;background:#fff1eb;color:#ff4301}
 .bc-t{font-size:16px;line-height:24px;font-weight:600;color:#1f2937}
 .bc-d{margin-top:4px;font-size:14px;line-height:20px;color:#6b7280}
 
@@ -382,6 +382,7 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   // ---------- Prototype params ----------
   // ?mode=today|after (default after)
   // ?stage=none|some|all (default none)  Line 3 Assembly's models: none = No models; some = 2 of 4 (Top View lacks Seal Bead and Surface Check); all = All models present
+  //   Line 5 Assembly is always 3 of 5 (own recipe with a fifth module, Connector Check)
   // ?open=create&kind=inference|capture  "Deploy Instances" drawer, Capture and inference or Only capture picked
   // ?open=deploy&target=line-N           that row's "Deploy" drawer
   // ?open=view                           the first running instance's "View" drawer
@@ -443,14 +444,15 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     { variant: 'Variant A', capture: 'Top View', type: 'Hardware Trigger', event: 'Line 1', modules: ['Seal Bead', 'Surface Check'] }
   ];
   var ALL_MODULES = ['Part Presence', 'Label Text', 'Seal Bead', 'Surface Check'];
-  var TOTAL_MODULES = ALL_MODULES.length;
-  function mk(n, models, missing, needsModel) {
+  function mk(n, models, missing, needsModel, total) {
     return { id: 'line-' + n, name: 'Line ' + n + ' Assembly', activeDashboard: 'Line ' + n + ' Assembly', plcName: 'PLC 1',
       status: 'stopped', kind: null, loadingMode: null, cycleTime: null, screen: null, variant: 'Variant A',
-      models: models, missing: missing, needsModel: needsModel !== false };
+      models: models, missing: missing, needsModel: needsModel !== false, total: total || ALL_MODULES.length };
   }
   var L3_MODELS = { none: ['none', ALL_MODULES], some: ['some', ['Seal Bead', 'Surface Check']], all: ['all', []] }[stage];
-  var INSTANCES = [mk(2, 'all', []), mk(3, L3_MODELS[0], L3_MODELS[1]), mk(4, 'bad', ALL_MODULES), mk(6, 'all', [], false)];
+  // Line 5 only exists after the change (today an upload with empty model slots is blocked).
+  var INSTANCES = [mk(2, 'all', []), mk(3, L3_MODELS[0], L3_MODELS[1]), mk(4, 'bad', ALL_MODULES)]
+    .concat(after ? [mk(5, 'some', ['Seal Bead', 'Surface Check'], true, 5)] : [], [mk(6, 'all', [], false)]);
   var L3 = INSTANCES[1];
   function syncNames() { var S = readShared(); L3.name = S.instanceName; L3.activeDashboard = S.instanceName; L3.instanceId = S.instanceId; }
   syncNames();
@@ -459,22 +461,21 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   var LOADING_MODES = [{ id: 0, name: 'Instance level' }, { id: 1, name: 'Variant level' }, { id: 3, name: 'Capture level' }];
   var KIND_LABEL = { inference: 'Capture and inference', capture: 'Only capture' };
   var KIND_DESC = { inference: 'Images are inspected with AI models.', capture: 'Raw images are saved. No AI models are loaded.' };
-  var DT_TIP = 'Capture and inference: images are inspected. Only capture: raw images are saved, no results.';
+  // Capture and inference needs every model: only All models present instances can be picked.
   var NO_INFERENCE = {
+    some: 'Not all models are present on this instance. Choose Only capture to deploy it.',
     none: 'No models on this instance. Choose Only capture to deploy it.',
     bad: 'Incorrect models on this instance. Choose Only capture to deploy it.'
   };
-  var NO_INFERENCE_SHORT = { none: 'No models on this instance.', bad: 'Incorrect models on this instance.' };
-  function canInfer(inst) { return inst.models === 'all' || inst.models === 'some'; }
+  var NO_INFERENCE_SHORT = { some: 'Not all models are present on this instance.', none: 'No models on this instance.', bad: 'Incorrect models on this instance.' };
+  function canInfer(inst) { return inst.models === 'all'; }
   // Today: the deploy check skips empty model slots, so an instance that still lacks models starts and then fails.
   function missingToday(inst) { return inst.needsModel && (inst.models === 'none' || inst.models === 'some'); }
   function chip(inst) {
     var m = inst.models;
-    var label = m === 'all' ? 'All models present' : m === 'some' ? (TOTAL_MODULES - inst.missing.length) + ' of ' + TOTAL_MODULES + ' models present' : m === 'none' ? 'No models' : 'Incorrect models';
+    var label = m === 'all' ? 'All models present' : m === 'some' ? (inst.total - inst.missing.length) + ' of ' + inst.total + ' models present' : m === 'none' ? 'No models' : 'Incorrect models';
     return '<span class="mchip ' + m + '">' + esc(label) + '</span>';
   }
-  // A capture runs inference when the instance needs no model, or every model-needing module in it has a model.
-  function captureInfers(inst, c) { return !inst.needsModel || c.modules.every(function (m) { return inst.missing.indexOf(m) < 0; }); }
 
   // ---------- Icons ----------
   var INFO16 = '<svg stroke="currentColor" fill="none" stroke-width="2.25" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>';
@@ -682,8 +683,8 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
       return '<div class="bc' + (on ? ' on' : '') + (dis ? ' dis' : '') + (ro ? ' ro' : '') + '"' + attrs + ' role="radio" aria-checked="' + on + '"' + (dis || ro ? ' aria-disabled="true"' : '') + '>' +
         '<label class="rd' + (on ? ' on' : '') + '"><i></i></label>' +
         '<div class="bc-ic">' + KIND_ICON[k] + '</div>' +
-        '<div class="bc-t">' + esc(KIND_LABEL[k]) + '</div>' +
-        '<p class="bc-d">' + esc(KIND_DESC[k]) + '</p></div>';
+        '<div><div class="bc-t">' + esc(KIND_LABEL[k]) + '</div>' +
+        '<p class="bc-d">' + esc(KIND_DESC[k]) + '</p></div></div>';
     };
     return '<div class="bento" role="radiogroup" aria-label="Deployment Type">' + card('inference') + card('capture') + '</div>';
   }
@@ -737,15 +738,13 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     return list().filter(function (i) { return dw.cfg[i.id] && dw.cfg[i.id].selected; });
   }
   function step2() {
-    // After change: per-capture Deployment Type (Capture and inference only), and each instance's Model Status chip.
-    var dtOn = after && dw.kind === 'inference';
-    var heads = [{ t: 'Variant' }, { t: 'Capture' }].concat(dtOn ? [{ t: 'Deployment Type', tip: DT_TIP }] : [], [
+    // After change: each instance's Model Status chip on its block.
+    var heads = [{ t: 'Variant' }, { t: 'Capture' }].concat([
       { t: 'Trigger Type', tip: 'How the camera is triggered: Hardware, Software or Streaming. Set in Capture Configuration.' },
       { t: 'Trigger Event', tip: 'What fires the capture, e.g. a camera line, a PLC read, a dashboard button or an internal action.' }]);
     return '<div>' + chosen().map(function (inst) {
       var rows = CAPTURES.map(function (c) {
         return '<tr>' + td(esc(c.variant)) + td(esc(c.capture)) +
-          (dtOn ? td(captureInfers(inst, c) ? '<span>' + esc(KIND_LABEL.inference) + '</span>' : '<span class="tag-oc">' + esc(KIND_LABEL.capture) + '</span>') : '') +
           td('<span>' + esc(c.type) + '</span>') + td('<span>' + esc(c.event) + '</span>') + '</tr>';
       }).join('');
       return '<div class="cap-blk"><div class="cap-h"><span>' + esc(inst.name) + '</span>' + (after ? chip(inst) : '') + '</div>' +
@@ -820,7 +819,11 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
     var pick = opts.pick || [];
     if (dw.bulk) {
       list().forEach(function (i) { if (i.status !== 'running') dw.cfg[i.id] = { selected: false, loadingMode: 0, screen: null, variant: 'Variant A' }; });
-      pick.forEach(function (id, n) { if (dw.cfg[id]) { dw.cfg[id].selected = true; dw.cfg[id].screen = 'Screen ' + (n + 1); } });
+      pick.forEach(function (id, n) {
+        var i = byId(id);
+        if (!dw.cfg[id] || (after && dw.kind === 'inference' && !canInfer(i))) return;
+        dw.cfg[id].selected = true; dw.cfg[id].screen = 'Screen ' + (n + 1);
+      });
     } else if (!dw.readOnly) {
       dw.cfg[dw.target.id] = { loadingMode: 0, screen: pick.indexOf(dw.target.id) >= 0 ? 'Screen 1' : null, variant: 'Variant A' };
     }
@@ -1073,7 +1076,8 @@ a.sb-item:hover{background:rgb(255 255 255/.2)}
   if (open === 'failed' && L3.status === 'failed') toast('err', failMsgOpen(), true);
   if (open === 'create') {
     var kind0 = after ? kindParam : 'inference';
-    var pick0 = kind0 === 'capture' ? ['line-3', 'line-4'] : stage === 'none' ? ['line-2', 'line-6'] : ['line-2', 'line-3'];
+    // Line 3 is ticked once it can be deployed: all models (after), or some models (today, where it is still selectable)
+    var pick0 = kind0 === 'capture' ? ['line-3', 'line-4'] : stage === 'all' || (!after && stage === 'some') ? ['line-2', 'line-3'] : ['line-2', 'line-6'];
     openDrawer({ bulk: true, instant: true, kind: kind0, pick: pick0, step: stepParam });
   } else if (open === 'deploy') {
     var tgt = byId(targetParam) || byId('line-4');
