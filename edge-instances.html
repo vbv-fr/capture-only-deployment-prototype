@@ -624,14 +624,12 @@ button.mchip:hover{filter:brightness(.96)}
     'Dashboards preserved, but some widget keys may be affected if class or model references changed.',
     'Inferencing customization (file paths, naming configs) preserved, but may need reconfiguration.'
   ];
-  // After: the analysed-image (ROI) reset is out of this change's scope, so its line is not shown.
-  var REUPLOAD_W_AFTER = [REUPLOAD_W[0], REUPLOAD_W[2], REUPLOAD_W[3]];
   // validateNewInstanceOnExistingEdge (228-233)
   var NEW_INSTANCE_W = [
     'Shared configs (camera configs, capture positions) will be deleted and re-created. This affects all instances on this edge.',
     'If camera config IDs have changed, re-upload the first instance as well.'
   ];
-  var LOCKED_NONE = 'Edge testing and Inferencing deployment stay locked until all models are added.';
+  var LOCKED_NONE = 'Edge testing stays locked until models are added. Inferencing deployment stays locked until all models are added.';
   var LOCKED_SOME = 'Captures missing models can\'t be tested. Inferencing deployment stays locked until all models are added.';
 
   function validate(p, target) {
@@ -656,7 +654,7 @@ button.mchip:hover{filter:brightness(.96)}
       res.summary = [['Instance', esc(p.instName + bracket)], ['Model Status', chipHTML(l3After)]];
       if (p.kind === 'config') push([LOCKED_NONE]);
       if (p.kind === 'some') push([LOCKED_SOME]);
-      if (p.hasSql) push(onBox ? REUPLOAD_W_AFTER : NEW_INSTANCE_W);
+      if (p.hasSql) push(onBox ? REUPLOAD_W : NEW_INSTANCE_W);
       res.models = modelsIn(p);
       res.gtDiffs = gtDiffsFor(p);
       return done();
